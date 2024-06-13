@@ -78,6 +78,18 @@
                 </select>
                 <div id="status-alert" class="alert alert-danger" style="display: none; margin-top: 5px">Status Penghuni harus dipilih.</div>
               </div>
+
+              <!-- role -->
+              <div class="col-md-6">
+                <label for="inputRole" class="form-label">Peran</label>
+                <select class="form-select" name="role" id="inputRole">
+                  <option value="">Pilih Peran</option>
+                  <!-- <option value="admin">Admin</option> -->
+                  <option value="penghuni">Penghuni</option>
+                </select>
+                <div id="role-alert" class="alert alert-danger" style="display: none; margin-top: 5px">Peran harus dipilih.</div>
+              </div>
+
               <div class="col-md-8">
                 <label for="inputKTP" class="form-label">Foto KTP</label>
                 <input type="file" name="poto_ktp" class="form-control" id="inputKTP" placeholder="Upload Foto KTP" />
@@ -114,6 +126,7 @@
     var umur = document.getElementById("inputUmur").value;
     var jenisKelamin = document.querySelector('input[name="jenisKelamin"]:checked');
     var status = document.getElementById("inputStatus").value;
+    var role = document.getElementById("inputRole").value;
     var ktp = document.getElementById("inputKTP").value;
 
     var isValid = true;
@@ -158,6 +171,13 @@
       isValid = false;
     } else {
       document.getElementById("status-alert").style.display = "none";
+    }
+
+    if (role === "") {
+      document.getElementById("role-alert").style.display = "block";
+      isValid = false;
+    } else {
+      document.getElementById("role-alert").style.display = "none";
     }
 
     if (ktp === "") {

@@ -4,16 +4,12 @@ from werkzeug.utils import secure_filename
 from bson.objectid import ObjectId
 from datetime import datetime, timedelta
 from werkzeug.security import generate_password_hash, check_password_hash
-from functools import wraps
-from passlib.hash import scrypt  
-from flask_session import Session
-from flask_login import current_user
-
-
+from functools import wraps 
+from flask_session import Session 
+ 
 import os
 import pytz
-import secrets
-import hashlib
+import secrets 
 import locale
 import bcrypt
 import jwt
@@ -64,7 +60,7 @@ def allowed_file(filename):
 MONGODB_CONNECTION_STRING = "mongodb+srv://tegarsultanrpl:sparta1234@cluster0.jfl6tmu.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
 client = MongoClient(MONGODB_CONNECTION_STRING)
 db = client.dbkontrakan
-users_collection = db['users']
+penghuni_collection = db['penghuni']
 
 # JWT configuration
 SECRET_KEY = app.secret_key
@@ -75,15 +71,35 @@ TOKEN_KEY = 'mytoken'
 # Route untuk halaman utama
 @app.route('/')
 def landingpage():
-    # Ambil seluruh data kontrakan dari MongoDB
-    kontrakan_list = db.kontrakan.find()
-    return render_template('landing_page.html', kontrakan_list=kontrakan_list)
+    try:
+        # Ambil seluruh data kontrakan dari MongoDB
+        kontrakan_list = list(db.kontrakan.find())  # Ubah cursor ke list
 
+        # Set locale sesuai dengan pengaturan lokal Anda
+        locale.setlocale(locale.LC_ALL, 'id_ID')
+
+        # Format harga kontrakan menjadi mata uang Rupiah
+        for kontrakan in kontrakan_list:
+            if 'harga' in kontrakan and kontrakan['harga'] is not None:
+                try:
+                    harga_numeric = float(kontrakan['harga'])  # Ubah ke float jika masih string
+                    kontrakan['formatted_harga'] = locale.currency(harga_numeric, grouping=True)
+                except ValueError:
+                    kontrakan['formatted_harga'] = 'Harga tidak valid'  # Penanganan jika harga tidak dapat diubah ke float
+            else:
+                kontrakan['formatted_harga'] = 'Harga tidak tersedia'  # Penanganan jika harga kosong atau tidak ada
+
+        return render_template('landing_page.html', kontrakan_list=kontrakan_list)
+
+    except Exception as e:
+        print(f"Error: {str(e)}")
+        return render_template('error_page.html', error=str(e))  # Render halaman error jika terjadi exception
+
+ 
 #  ------------------------ END LANDINGPAGE ------------------------ 
 
 
-
-#  ------------------------ START LOGIN ------------------------ 
+# ------------------------ START LOGIN ------------------------ 
 def login_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
@@ -102,7 +118,7 @@ def role_required(role):
             if not user_id:
                 return "Access denied: No user id in session", 403
             
-            user = users_collection.find_one({'_id': ObjectId(user_id)})
+            user = penghuni_collection.find_one({'_id': ObjectId(user_id)})
             if not user:
                 return "Access denied: User not found", 403
             
@@ -127,7 +143,7 @@ def check_password_hash(password, hashed):
 def load_current_user():
     user_id = session.get('user_id')
     if user_id:
-        g.current_user = users_collection.find_one({'_id': ObjectId(user_id)})
+        g.current_user = penghuni_collection.find_one({'_id': ObjectId(user_id)})
     else:
         g.current_user = None
 
@@ -138,7 +154,7 @@ def inject_user():
 
 
 
-# Routes
+# Routes login
 @app.route("/login", methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
@@ -146,7 +162,7 @@ def login():
         password = request.form.get('pass')
         logging.debug(f"Login attempt for email: {email}")
 
-        user = users_collection.find_one({'email': email})
+        user = penghuni_collection.find_one({'email': email})
 
         if user:
             logging.debug(f"User found in database: {user['email']}")
@@ -175,14 +191,15 @@ def login():
                 return response
             else:
                 logging.debug("Password check failed")
+                return render_template('views/login/login.html', error_msg="Invalid email or password")
         else:
             logging.debug("User not found in database")
-
-        return jsonify({"result": "fail", "msg": "Invalid email or password"})
+            return render_template('views/login/login.html', error_msg="Invalid email or password")
 
     msg = request.args.get("msg")
-    return render_template('views/login/login.html', msg=msg)
-
+    return render_template('views/login/login.html', msg=msg) 
+ 
+# Routes logout
 @app.route("/logout")
 def logout():
     response = redirect(url_for('login'))
@@ -196,12 +213,12 @@ def user(email):
     try:
         payload = jwt.decode(token_receive, SECRET_KEY, algorithms=["HS256"])
         status = email == payload.get('id')
-        user_info = db.users.find_one({"email": email}, {"_id": False})
+        user_info = penghuni_collection.find_one({"email": email}, {"_id": False})
         return render_template("user.html", user_info=user_info, status=status)
     except (jwt.ExpiredSignatureError, jwt.exceptions.DecodeError):
         return redirect(url_for("home"))
 
- 
+
 #  ------------------------ END LOGIN ------------------------ 
 
  
@@ -308,6 +325,53 @@ def homepage_admin():
 #  ------------------------ END HOMEPAGE ------------------------ 
  
 
+#  ------------------------ START UPDATE AKUN ADMIN ------------------------ 
+
+@views_bp.route('/admin/setting_akun/<user_id>', methods=['GET', 'POST'])
+@login_required
+@role_required('admin')
+def update_account_admin(user_id):
+    print(f'Debug: user_id = {user_id}')  # Debug untuk memastikan user_id
+    if request.method == 'GET': 
+        admin = db.penghuni.find_one({"_id": ObjectId(user_id)}) 
+        print(f'Debug: admin = {admin}')  # Debug untuk memastikan data admin ditemukan
+
+        if not admin:
+            flash(f'Admin dengan ID {user_id} tidak ditemukan', 'error')
+            return redirect(url_for('homepage_admin'))
+
+        return render_template('/admin/setting_akun/index.html', admin=admin)
+
+    elif request.method == 'POST':
+        email = request.form['email']
+        password = request.form['password']
+        nama = request.form['nama']
+
+        update_data = {
+            'email': email,
+            'nama': nama,
+        }
+
+        if password:
+            pw_hash = generate_password_hash(password)
+            update_data['password'] = pw_hash
+
+        # Update data di collection admin
+        admin_result = db.admin.update_one({'_id': ObjectId(user_id)}, {"$set": update_data})
+        print(f'Debug: admin_result = {admin_result.matched_count} matched, {admin_result.modified_count} modified')
+
+        if admin_result.matched_count == 0:
+            flash(f'Admin dengan ID {user_id} tidak ditemukan', 'error')
+            return redirect(url_for('homepage_admin'))
+
+        flash('Akun admin berhasil diperbarui', 'success')
+        return redirect(url_for('views.update_account_admin', user_id=user_id))
+
+
+
+#  ------------------------ END UPDATE AKUN ADMIN ------------------------ 
+
+
 
 #  ------------------------ START PENGHUNI ------------------------ 
 
@@ -332,6 +396,7 @@ def tambah_penghuni():
         umur = request.form['umur']
         jenisKelamin = request.form['jenisKelamin']
         status = request.form['status']
+        role = request.form['role']  # Tambahan input role
         poto_ktp = request.files['poto_ktp']
         
         if poto_ktp and allowed_file(poto_ktp.filename):
@@ -356,22 +421,18 @@ def tambah_penghuni():
             'umur': umur,
             'jenisKelamin': jenisKelamin,
             'status': status,
+            'role': role,  # Peran yang dipilih
             'poto_ktp': namaGambar
         }
         db.penghuni.insert_one(doc_penghuni)
 
-        # Insert data ke collection users
-        doc_user = {
-            'nama': nama,
-            'email': email,
-            'password': pw_hash.decode('utf-8'),  # Decode to store as string
-            'role': 'penghuni'
-        }
-        db.users.insert_one(doc_user)
+         
 
         return redirect(url_for('views.penghuni'))
 
     return render_template('views/admin/penghuni/tambah_penghuni.html')
+
+
 
 # Route for edit_penghuni page
 @views_bp.route('/admin/penghuni/edit_penghuni/<penghuni_id>', methods=['GET', 'POST'])
@@ -380,25 +441,29 @@ def tambah_penghuni():
 def edit_penghuni(penghuni_id):
     if request.method == 'GET':
         penghuni = db.penghuni.find_one({"_id": ObjectId(penghuni_id)})
-        return render_template('views/admin/penghuni/edit_penghuni.html', penghuni=penghuni)
+        user = db.users.find_one({"email": penghuni['email']})
+        return render_template('views/admin/penghuni/edit_penghuni.html', penghuni=penghuni, user=user)
     elif request.method == 'POST':
         email = request.form['email']
         password = request.form['password']
         nama = request.form['nama']
+        umur = request.form['umur']
         jenisKelamin = request.form['jenisKelamin']
         status = request.form['status']
+        role = request.form['role']
         poto_ktp = request.files['poto_ktp']
         
         update_data = {
             'email': email,
             'nama': nama,
+            'umur': umur,
             'jenisKelamin': jenisKelamin,
             'status': status,
         }
 
         if password:
-            pw_hash = generate_password_hash(password)
-            update_data['password'] = pw_hash
+            pw_hash = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
+            update_data['password'] = pw_hash.decode('utf-8')
         
         if poto_ktp and allowed_file(poto_ktp.filename):
             today = datetime.now()
@@ -418,9 +483,10 @@ def edit_penghuni(penghuni_id):
             update_user_data = {
                 'email': email,
                 'nama': nama,
+                'role': role,
             }
             if password:
-                update_user_data['password'] = pw_hash
+                update_user_data['password'] = pw_hash.decode('utf-8')
 
             db.users.update_one({'_id': user['_id']}, {"$set": update_user_data})
         else:
@@ -483,6 +549,7 @@ def kontrakan():
     kontrakan = list(db.kontrakan.find({}))
     return render_template('views/admin/kontrakan/index.html', kontrakan=kontrakan)
 
+
 # routes tambah kontrakan
 @views_bp.route('/admin/kontrakan/tambah_kontrakan', methods=['GET', 'POST'])
 @login_required
@@ -494,8 +561,16 @@ def tambah_kontrakan():
         harga = request.form['harga']
         status = request.form['status_kontrakan']  # Memperbaiki nama field
         alamat = request.form['alamat']
-        kapasitas = request.form['kapasitas']  # Menambahkan kapasitas
+        kapasitas = request.form['kapasitas']
+        tipeKontrakan = request.form['tipeKontrakan']
         gambar = request.files['image']
+        
+        # Validasi dan konversi harga ke integer
+        try:
+            harga = int(harga)
+        except ValueError:
+            flash('Harga harus berupa bilangan bulat.', 'error')
+            return redirect(request.url)
         
         # Logika untuk menyimpan gambar (jika ada)
         if gambar.filename != '':
@@ -523,7 +598,8 @@ def tambah_kontrakan():
             'harga': harga,
             'status': status,
             'alamat': alamat,
-            'kapasitas': kapasitas,  # Menambahkan kapasitas
+            'kapasitas': kapasitas,
+            'tipeKontrakan': tipeKontrakan,
             'gambar': namaGambar
         }
         
@@ -536,11 +612,12 @@ def tambah_kontrakan():
     # Render halaman tambah kontrakan jika metode adalah GET
     return render_template('views/admin/kontrakan/tambah_kontrakan.html')
 
-# routes edit kontrakan 
+
+# routes edit kontrakan
 @views_bp.route('/admin/kontrakan/edit_kontrakan/<kontrakan_id>', methods=['GET', 'POST'])
 @login_required
 @role_required('admin')
-def edit_kontrakan(kontrakan_id): 
+def edit_kontrakan(kontrakan_id):
     if request.method == 'POST':
         # Update - Mengedit kontrakan yang ada
         nama_kontrakan = request.form['nama_kontrakan']
@@ -548,7 +625,15 @@ def edit_kontrakan(kontrakan_id):
         status = request.form['status']
         alamat = request.form['alamat']
         kapasitas = request.form['kapasitas']
+        tipeKontrakan = request.form['tipeKontrakan']
         gambar = request.files['image']
+        
+        # Validasi dan konversi harga ke integer
+        try:
+            harga = int(harga)
+        except ValueError:
+            flash('Harga harus berupa bilangan bulat.', 'error')
+            return redirect(request.url)
         
         # Pastikan semua data wajib terisi
         if not (nama_kontrakan and harga and status and alamat and kapasitas):
@@ -561,6 +646,7 @@ def edit_kontrakan(kontrakan_id):
             'status': status,
             'alamat': alamat,
             'kapasitas': kapasitas,
+            'tipeKontrakan': tipeKontrakan,
         }
         
         if gambar.filename != '':
@@ -587,6 +673,8 @@ def edit_kontrakan(kontrakan_id):
         return "Kontrakan tidak ditemukan", 404
     return render_template('views/admin/kontrakan/edit_kontrakan.html', data=data)
 
+
+# routes detail kontrakan
 @views_bp.route('/admin/kontrakan/detail_kontrakan/<kontrakan_id>', methods=['GET', 'POST'])
 @login_required
 @role_required('admin')
@@ -1014,47 +1102,43 @@ def tambah_keluhan():
     kontrakan = db.kontrakan.find()
     return render_template('views/admin/keluhan/tambah_keluhan.html', user=user, kontrakan=kontrakan)
 
-# Route for edit_keluhan page (Update complaint)
 @views_bp.route('/admin/keluhan/edit_keluhan/<keluhan_id>', methods=['GET', 'POST'])
 @login_required
 @role_required('admin')
 def edit_keluhan(keluhan_id):
     if request.method == 'POST':
-        penghuni_id = request.form['penghuni']
-        kontrakan_id = request.form['kontrakan']
-        tgl_keluhan = request.form['tgl_keluhan']
-        status = request.form['status']
-        keluhan_penghuni = request.form['keluhan_penghuni']
-        gambar_keluhan = request.files['gambar_keluhan']
+        try:
+            penghuni_id = request.form['penghuni']
+            kontrakan_id = request.form['kontrakan']
+            tgl_keluhan = request.form['tgl_keluhan']
+            status = request.form['status']
+            keluhan_penghuni = request.form['keluhan_penghuni']
+            gambar_keluhan = request.files['gambar_keluhan']
 
-        update_data = { 
-            'kontrakan_id': ObjectId(kontrakan_id),
-            'tgl_keluhan': tgl_keluhan,
-            'status': status,
-            'keluhan_penghuni': keluhan_penghuni,
-        }
+            update_data = { 
+                'kontrakan_id': ObjectId(kontrakan_id),
+                'tgl_keluhan': tgl_keluhan,
+                'status': status,
+                'keluhan_penghuni': keluhan_penghuni,
+            }
 
-        if gambar_keluhan and allowed_file(gambar_keluhan.filename):
-            filename = secure_filename(gambar_keluhan.filename)
-            file_path = os.path.join(app.config["UPLOAD_FOLDER_KELUHAN"], filename)
-            gambar_keluhan.save(file_path)
-            update_data['gambar_keluhan'] = file_path
+            if gambar_keluhan and allowed_file(gambar_keluhan.filename):
+                filename = secure_filename(gambar_keluhan.filename)
+                file_path = os.path.join(app.config["UPLOAD_FOLDER_KELUHAN"], filename)
+                gambar_keluhan.save(file_path)
+                update_data['gambar_keluhan'] = file_path
 
-        db.keluhan.update_one({'_id': ObjectId(keluhan_id)}, {'$set': update_data})
-        return redirect(url_for('views.keluhan'))
+            db.keluhan.update_one({'_id': ObjectId(keluhan_id)}, {'$set': update_data})
+            flash('Keluhan berhasil diperbarui', 'success')
+            return redirect(url_for('views.keluhan'))
+        except Exception as e:
+            flash(f'Error: {str(e)}', 'error')
+            return redirect(url_for('views.edit_keluhan', keluhan_id=keluhan_id))
 
     try:
         pipeline = [
             {
                 '$match': {'_id': ObjectId(keluhan_id)}
-            },
-            {
-                '$lookup': {
-                    'from': 'users',
-                    'localField': 'penghuni_id',
-                    'foreignField': '_id',
-                    'as': 'user_data'
-                }
             },
             {
                 '$lookup': {
@@ -1065,14 +1149,9 @@ def edit_keluhan(keluhan_id):
                 }
             },
             {
-                '$addFields': {
-                    'penghuni_data': {
-                        '$cond': {
-                            'if': { '$gt': [{ '$size': '$user_data' }, 0] },
-                            'then': { '$arrayElemAt': ['$user_data', 0] },
-                            'else': { '$arrayElemAt': ['$penghuni_data', 0] }
-                        }
-                    }
+                '$unwind': {
+                    'path': '$penghuni_data',
+                    'preserveNullAndEmptyArrays': True
                 }
             },
             {
@@ -1096,14 +1175,9 @@ def edit_keluhan(keluhan_id):
                     'tgl_keluhan': 1,
                     'gambar_keluhan': 1,
                     'status': 1,
-                    'nama_penghuni': {
-                        '$ifNull': [
-                            { '$arrayElemAt': ['$user_data.nama', 0] },
-                            { '$arrayElemAt': ['$penghuni_data.nama', 0] }
-                        ]
-                    },
-                     'nama_kontrakan': '$kontrakan.nama_kontrakan',
-                     'kontrakan_id': '$kontrakan._id'
+                    'nama_penghuni': '$penghuni_data.nama',
+                    'nama_kontrakan': '$kontrakan.nama_kontrakan',
+                    'kontrakan_id': '$kontrakan._id'
                 }
             }
         ]
@@ -1212,13 +1286,6 @@ def hapus_keluhan(keluhan_id):
 # ------------------------ START BAGIAN PENYEWA ------------------------
 
 #  ------------------------ START HOMEPAGE PENGHUNI ------------------------ 
-from datetime import datetime
-from flask import render_template
-from bson import json_util
-import pytz
-import locale
-from app import db  # Pastikan ini disesuaikan dengan struktur aplikasi Anda
-
 @views_bp.route('/homepage')
 @login_required
 @role_required('penghuni')
@@ -1227,90 +1294,7 @@ def homepage():
     penghuni_count = db.penghuni.count_documents({})
     kontrakan_count = db.kontrakan.count_documents({})
     keluhan_count = db.keluhan.count_documents({})
-
-    # Mengambil jumlah keluhan per bulan selama 12 bulan terakhir
-    keluhan_per_bulan = db.keluhan.aggregate([
-        {
-            "$addFields": {
-                "tgl_keluhan": {
-                    "$dateFromString": {
-                        "dateString": "$tgl_keluhan"
-                    }
-                }
-            }
-        },
-        {
-            "$group": {
-                "_id": {
-                    "year": {"$year": "$tgl_keluhan"},
-                    "month": {"$month": "$tgl_keluhan"}
-                },
-                "count": {"$sum": 1}
-            }
-        },
-        {
-            "$sort": {"_id.year": 1, "_id.month": 1}
-        }
-    ])
-    keluhan_per_bulan = list(keluhan_per_bulan)
-    print("Keluhan per bulan:", keluhan_per_bulan)
-
-    # Mengambil jumlah transaksi per bulan selama 12 bulan terakhir
-    transaksi_per_bulan = db.transaksi.aggregate([
-        {
-            "$addFields": {
-                "tgl_pembayaran": {
-                    "$dateFromString": {
-                        "dateString": "$tgl_pembayaran"
-                    }
-                }
-            }
-        },
-        {
-            "$group": {
-                "_id": {
-                    "year": {"$year": "$tgl_pembayaran"},
-                    "month": {"$month": "$tgl_pembayaran"}
-                },
-                "total": {"$sum": "$total_harga"}
-            }
-        },
-        {
-            "$sort": {"_id.year": 1, "_id.month": 1}
-        }
-    ])
-    transaksi_per_bulan = list(transaksi_per_bulan)
-    print("Transaksi per bulan:", transaksi_per_bulan)
-
-    # Membuat list untuk data keluhan dan transaksi
-    keluhan_data = [0] * 12
-    transaksi_data = [0] * 12
-    months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
-
-    # Mendapatkan bulan saat ini
-    jakarta_tz = pytz.timezone('Asia/Jakarta')
-    now = datetime.now(jakarta_tz)
-    current_year = now.year
-    current_month = now.month
-
-    # Mengisi data keluhan per bulan
-    for item in keluhan_per_bulan:
-        year = item['_id']['year']
-        month = item['_id']['month']
-        month_index = (year - current_year) * 12 + month - current_month
-        if -11 <= month_index <= 0:
-            keluhan_data[month_index + 11] = item['count']
-        print(f"Keluhan year: {year}, month: {month}, month_index: {month_index}, count: {item['count']}")
-
-    # Mengisi data transaksi per bulan
-    for item in transaksi_per_bulan:
-        year = item['_id']['year']
-        month = item['_id']['month']
-        month_index = (year - current_year) * 12 + month - current_month
-        if -11 <= month_index <= 0:
-            transaksi_data[month_index + 11] = item['total']
-        print(f"Transaksi year: {year}, month: {month}, month_index: {month_index}, total: {item['total']}")
-
+ 
     # Mengambil total transaksi
     transaksi_total = db.transaksi.aggregate([
         {
@@ -1321,12 +1305,10 @@ def homepage():
         }
     ])
     transaksi_total = next(transaksi_total, {'total': 0})['total']
-
-    current_date = now.strftime('%A, %d %B %Y')
-    current_time = now.strftime('%H:%M')
+ 
 
     # Set locale sesuai dengan pengaturan lokal Anda
-    locale.setlocale(locale.LC_ALL, 'en_US.UTF-8')
+    locale.setlocale(locale.LC_ALL, 'id_ID')
 
     # Ubah nilai transaksi_total menjadi format mata uang yang diinginkan
     transaksi_total_str = locale.currency(transaksi_total, grouping=True)
@@ -1384,20 +1366,13 @@ def homepage():
 
     keluhan_list = list(db.keluhan.aggregate(pipeline))
 
-    return render_template('views/penyewa/index.html',
-                           current_date=current_date,
-                           current_time=current_time,
+    return render_template('views/penyewa/index.html', 
                            data_keluhan=keluhan_list,
                            penghuni_count=penghuni_count,
                            kontrakan_count=kontrakan_count,
                            keluhan_count=keluhan_count,
-                           transaksi_total=transaksi_total_str,
-                           keluhan_per_bulan=keluhan_data,
-                           transaksi_per_bulan=transaksi_data,
-                           months=months
+                           transaksi_total=transaksi_total_str, 
                            )
-
-
 #  ------------------------ END HOMEPAGE PENGHUNI ------------------------ 
 
 
@@ -1408,14 +1383,16 @@ def homepage():
 @login_required
 @role_required('penghuni')
 def update_account_penghuni(user_id):
-    print(f'Debug: user_id = {user_id}')  # Tambahkan debug print
-    if request.method == 'GET':
-        user = db.users.find_one({"_id": ObjectId(user_id)})
-        if not user:
+    print(f'Debug: user_id = {user_id}')  # Debug untuk memastikan user_id
+    if request.method == 'GET': 
+        penghuni = db.penghuni.find_one({"_id": ObjectId(user_id)}) 
+        print(f'Debug: penghuni = {penghuni}')  # Debug untuk memastikan data penghuni ditemukan
+
+        if not penghuni:
             flash(f'Penghuni dengan ID {user_id} tidak ditemukan', 'error')
             return redirect(url_for('views.homepage'))
 
-        return render_template('/penyewa/setting_akun/index.html', user=user)
+        return render_template('/penyewa/setting_akun/index.html', penghuni=penghuni)
 
     elif request.method == 'POST':
         email = request.form['email']
@@ -1423,18 +1400,19 @@ def update_account_penghuni(user_id):
         nama = request.form['nama']
 
         update_data = {
-            'email': email, 
+            'email': email,
             'nama': nama,
         }
 
         if password:
             pw_hash = generate_password_hash(password)
             update_data['password'] = pw_hash
+ 
+        # Update data di collection penghuni
+        penghuni_result = db.penghuni.update_one({'_id': ObjectId(user_id)}, {"$set": update_data})
+        print(f'Debug: penghuni_result = {penghuni_result.matched_count} matched, {penghuni_result.modified_count} modified')
 
-        # Update data di collection users
-        result = db.users.update_one({'_id': ObjectId(user_id)}, {"$set": update_data})
-
-        if result.matched_count == 0:
+        if penghuni_result.matched_count == 0:
             flash(f'Penghuni dengan ID {user_id} tidak ditemukan', 'error')
             return redirect(url_for('views.homepage'))
 
@@ -1965,66 +1943,31 @@ app.register_blueprint(views_bp)
 
 
 def seed_data():
-    # Seed Penghuni
-    penghuni_data = [
-        {
-            'email': 'penghuni1@example.com',
-            'password': hashlib.sha256('password1'.encode("utf-8")).hexdigest(),
-            'nama': 'Penghuni Satu',
-            'umur': 30,
-            'jenisKelamin': 'Laki-laki',
-            'status': 'Aktif',
-            'poto_ktp': 'static/upload/ktp/penghuni1.jpg'
-        },
-        {
-            'email': 'penghuni2@example.com',
-            'password': hashlib.sha256('password2'.encode("utf-8")).hexdigest(),
-            'nama': 'Penghuni Dua',
-            'umur': 25,
-            'jenisKelamin': 'Perempuan',
-            'status': 'Aktif',
-            'poto_ktp': 'static/upload/ktp/penghuni2.jpg'
-        }
-    ]
-    db.penghuni.insert_many(penghuni_data)
-
-    # Seed Kontrakan
-    kontrakan_data = [
-        {
-            'nama_kontrakan': 'Kontrakan A',
-            'harga': 2000000,
-            'status': 'Tersedia',
-            'alamat': 'Jl. Merdeka No. 1',
-            'kapasitas': 3,
-            'gambar': 'static/upload/kontrakan/kontrakan_a.jpg'
-        },
-        {
-            'nama_kontrakan': 'Kontrakan B',
-            'harga': 1500000,
-            'status': 'Tersedia',
-            'alamat': 'Jl. Sudirman No. 2',
-            'kapasitas': 2,
-            'gambar': 'static/upload/kontrakan/kontrakan_b.jpg'
-        }
-    ]
-    db.kontrakan.insert_many(kontrakan_data)
-
+    
     # Seed User
     user_data = [
         {
-            'email': 'admin@example.com',
-            'password': generate_password_hash('adminpassword'),
+            'email': 'admin@gmail.com',
+            'password': generate_password_hash('admin1234'),
             'role': 'admin',
-            'nama': 'Admin User'
+            'nama': 'Tegar',
+            'umur': '22',
+            'jenisKelamin': 'Laki-Laki',
+            'status': 'Belum Menikah',
+            'poto_ktp': '',
         },
         {
-            'email': 'user@example.com',
-            'password': generate_password_hash('userpassword'),
+            'email': 'penghuni@gmail.com',
+            'password': generate_password_hash('penghuni1234'),
             'role': 'penghuni',
-            'nama': 'Regular User'
-        }
+            'nama': 'Danu',
+            'umur': '24',
+            'jenisKelamin': 'Laki-Laki',
+            'status': 'Belum Menikah',
+            'poto_ktp': '',
+        }  
     ]
-    db.users.insert_many(user_data)
+    db.penghuni.insert_many(user_data)
  
 if __name__ == '__main__': 
     # seed_data()

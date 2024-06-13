@@ -154,78 +154,12 @@
         </div>
       </div>
       <!-- End Right side columns -->
-<!-- Grafik Keluhan -->
-<div class="col-lg-12">
-  <div class="card">
-    <div class="card-body">
-      <h5 class="card-title">Grafik Keluhan</h5>
-      <canvas id="keluhanChart"></canvas>
-    </div>
-  </div>
-</div>
-<!-- End Grafik Keluhan -->
-
-<!-- Grafik Transaksi -->
-<div class="col-lg-12">
-  <div class="card">
-    <div class="card-body">
-      <h5 class="card-title">Grafik Transaksi</h5>
-      <canvas id="transaksiChart"></canvas>
-    </div>
-  </div>
-</div>
-<!-- End Grafik Transaksi -->
+     
+  </section>
+  <!-- end section dashboard -->
+</main>
+<!-- End #main -->
 
 <!-- footer -->
 {% include '/penyewa/dashboard/footer.html' %}
-
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script>
-  const keluhanCtx = document.getElementById('keluhanChart').getContext('2d');
-  const keluhanChart = new Chart(keluhanCtx, {
-      type: 'line',
-      data: {
-          labels: {{ months|tojson|safe }},
-          datasets: [{
-              label: 'Keluhan',
-              data: {{ keluhan_per_bulan|tojson|safe }},
-              borderColor: 'rgba(255, 99, 132, 1)',
-              backgroundColor: 'rgba(255, 99, 132, 0.2)',
-              borderWidth: 1
-          }]
-      },
-      options: {
-          responsive: true,
-          scales: {
-              y: {
-                  beginAtZero: true
-              }
-          }
-      }
-  });
-
-  const transaksiCtx = document.getElementById('transaksiChart').getContext('2d');
-  const transaksiChart = new Chart(transaksiCtx, {
-      type: 'line',
-      data: {
-          labels: {{ months|tojson|safe }},
-          datasets: [{
-              label: 'Transaksi',
-              data: {{ transaksi_per_bulan|tojson|safe }},
-              borderColor: 'rgba(54, 162, 235, 1)',
-              backgroundColor: 'rgba(54, 162, 235, 0.2)',
-              borderWidth: 1
-          }]
-      },
-      options: {
-          responsive: true,
-          scales: {
-              y: {
-                  beginAtZero: true
-              }
-            }
-          }
-      });
-    
-    </script>
-    
+ 

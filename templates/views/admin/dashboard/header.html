@@ -15,7 +15,7 @@
     <!-- Google Fonts -->
     <link href="https://fonts.gstatic.com" rel="preconnect" />
     <link
-      href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Nunito:300,300i,400,400i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i"
+      href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Nunito:300,300i,400,400i,600,600i,700,700i"
       rel="stylesheet"
     />
 
@@ -107,7 +107,14 @@
                         <hr class="dropdown-divider"/>
                     </li>
                     <li>
-                        <a class="dropdown-item d-flex align-items-center" href="{{ url_for('logout') }}">
+                      <a class="dropdown-item d-flex align-items-center" href="{{ url_for('views.update_account_admin', user_id=current_user._id) }}">
+                          <i class="bi bi-gear"></i>
+                          <span>Edit Account</span>
+                      </a>
+                  </li>
+                  
+                    <li>
+                        <a class="dropdown-item d-flex align-items-center" href="#" onclick="confirmLogout()">
                             <i class="bi bi-box-arrow-right"></i>
                             <span>Sign Out</span>
                         </a>
@@ -123,3 +130,14 @@
     
     </header>
     <!-- End Header -->
+
+    <script>
+      function confirmLogout() {
+          const userName = "{{ current_user.nama }}";
+          if (confirm(`Hallo ${userName}, apakah anda yakin ingin logout?`)) {
+              window.location.href = "{{ url_for('logout') }}";
+          }
+      }
+    </script>
+  </body>
+</html>

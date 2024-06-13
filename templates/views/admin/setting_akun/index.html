@@ -1,15 +1,15 @@
 <!-- Header -->
-{% include '/penyewa/dashboard/header.html' %}
+{% include '/admin/dashboard/header.html' %}
 
 <!-- Sidebar -->
-{% include '/penyewa/dashboard/navbar_homepage.html' %}
+{% include '/admin/dashboard/sidebar.html' %}
 
 <main id="main" class="main">
-  <div class="pagetitle text-center">
-    <h1>Edit Penghuni</h1>
+  <div class="pagetitle ">
+    <h1>Edit Account </h1>
     <nav>
       <ol class="breadcrumb">
-        <li class="breadcrumb-item"><a href="{{ url_for('views.homepage') }}">Dashboard</a></li>
+        <li class="breadcrumb-item"><a href="{{ url_for('homepage_admin') }}">Dashboard</a></li>
         <li class="breadcrumb-item active">Setting Account</li>
       </ol>
     </nav>
@@ -31,8 +31,8 @@
 
             <!-- Multi Columns Form -->
             <form
-              id="form-penghuni"
-              action="{{ url_for('views.update_account_penghuni', user_id=penghuni._id) }}"
+              id="form-admin"
+              action="{{ url_for('views.update_account_admin', user_id=admin._id) }}"
               method="POST"
               enctype="multipart/form-data"
               class="row g-3"
@@ -45,8 +45,8 @@
                   name="email"
                   class="form-control"
                   id="inputEmail"
-                  placeholder="Masukkan Email Penghuni"
-                  value="{{ penghuni.email }}"
+                  placeholder="Masukkan Email Admin"
+                  value="{{ admin.email }}"
                 />
                 <div id="email-alert" class="alert alert-danger" style="display: none; margin-top: 5px">
                   Email harus diisi.
@@ -54,14 +54,14 @@
               </div>
 
               <div class="col-md-4">
-                <label for="inputName" class="form-label">Nama Penghuni</label>
+                <label for="inputName" class="form-label">Nama Admin</label>
                 <input
                   type="text"
                   name="nama"
                   class="form-control"
                   id="inputName"
-                  placeholder="Masukkan Nama Penghuni"
-                  value="{{ penghuni.nama }}"
+                  placeholder="Masukkan Nama Admin"
+                  value="{{ admin.nama }}"
                 />
                 <div id="nama-alert" class="alert alert-danger" style="display: none; margin-top: 5px">
                   Nama harus diisi.
@@ -75,7 +75,7 @@
                   name="password"
                   class="form-control"
                   id="inputPassword"
-                  placeholder="Masukkan Password Penghuni (leave blank to keep current password)"
+                  placeholder="Masukkan Password Admin (leave blank to keep current password)"
                 />
                 <div id="password-alert" class="alert alert-danger" style="display: none; margin-top: 5px">
                   Password harus diisi.
@@ -84,7 +84,7 @@
 
               <div class="text-center">
                 <button type="submit" class="btn btn-primary">Update Data</button>
-                <a href="{{ url_for('views.homepage') }}" class="btn btn-danger">Kembali</a>
+                <a href="{{ url_for('homepage_admin') }}" class="btn btn-danger">Kembali</a>
               </div>
             </form>
             <!-- End Multi Columns Form -->
@@ -97,10 +97,10 @@
 <!-- End #main -->
 
 <!-- footer -->
-{% include '/penyewa/dashboard/footer.html' %}
+{% include '/admin/dashboard/footer.html' %}
 
 <script>
-  document.getElementById("form-penghuni").addEventListener("submit", function(event) {
+  document.getElementById("form-admin").addEventListener("submit", function(event) {
       event.preventDefault(); // Prevent default form submission
       
       validateForm(); // Validate form
@@ -127,16 +127,16 @@
       }
   
       if (isValid) { 
-          document.getElementById("form-penghuni").submit(); // Submit form
+          document.getElementById("form-admin").submit(); // Submit form
       } else {
-          alert('Akun Penghuni Gagal Diupdate!'); // Display an alert if the form is not valid
-          document.getElementById("error-alert").innerText = "Data Penghuni Gagal Diupdate!";
+          alert('Akun Admin Gagal Diupdate!'); // Display an alert if the form is not valid
+          document.getElementById("error-alert").innerText = "Data Admin Gagal Diupdate!";
           document.getElementById("error-alert").style.display = "block";
       }
   }
 
   // Setelah form berhasil dikirim, tampilkan pesan sukses
-  document.getElementById("form-penghuni").onsubmit = function() {
+  document.getElementById("form-admin").onsubmit = function() {
     alert('Akun Berhasil Diupdate!'); // Display an alert if the form is valid
     document.getElementById("success-alert").innerText = "Akun Berhasil Diupdate!!";
     document.getElementById("success-alert").style.display = "block";

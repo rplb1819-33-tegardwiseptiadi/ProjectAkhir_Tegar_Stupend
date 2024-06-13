@@ -15,9 +15,12 @@
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='assets_penghuni/assets_login/vendor/daterangepicker/daterangepicker.css') }}">
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='assets_penghuni/assets_login/css/util.css') }}">
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='assets_penghuni/assets_login/css/main.css') }}">
+
+    <!-- SweetAlert CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
 </head>
 <body>
-    <div class="limiter"> 
+    <div class="limiter">
         <div class="container-login100" style="background-image: url('{{ url_for('static', filename='assets_penghuni/assets_login/images/bg-01.jpg') }}');">
             <div class="wrap-login100 p-l-55 p-r-55 p-t-65 p-b-54">
                 <form class="login100-form validate-form" method="POST" action="{{ url_for('login') }}">
@@ -56,7 +59,8 @@
     </div>
 
     <div id="dropDownSelect1"></div>
-    
+
+    <!-- Existing JavaScript files -->
     <script src="{{ url_for('static', filename='assets_penghuni/assets_login/vendor/jquery/jquery-3.2.1.min.js') }}"></script>
     <script src="{{ url_for('static', filename='assets_penghuni/assets_login/vendor/animsition/js/animsition.min.js') }}"></script>
     <script src="{{ url_for('static', filename='assets_penghuni/assets_login/vendor/bootstrap/js/popper.js') }}"></script>
@@ -66,5 +70,30 @@
     <script src="{{ url_for('static', filename='assets_penghuni/assets_login/vendor/daterangepicker/daterangepicker.js') }}"></script>
     <script src="{{ url_for('static', filename='assets_penghuni/assets_login/vendor/countdowntime/countdowntime.js') }}"></script>
     <script src="{{ url_for('static', filename='assets_penghuni/assets_login/js/main.js') }}"></script>
+
+    <!-- SweetAlert JavaScript -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <script>
+        // Check if there's an error message and show SweetAlert
+        {% if error_msg %}
+        Swal.fire({
+            icon: 'error',
+            title: 'Login Failed',
+            text: '{{ error_msg }}',
+            confirmButtonText: 'OK'
+        });
+        {% endif %}
+
+        // Check if there's a success message and show SweetAlert
+        {% if success_msg %}
+        Swal.fire({
+            icon: 'success',
+            title: 'Login Successful',
+            text: '{{ success_msg }}',
+            confirmButtonText: 'OK'
+        });
+        {% endif %}
+    </script>
 </body>
 </html>

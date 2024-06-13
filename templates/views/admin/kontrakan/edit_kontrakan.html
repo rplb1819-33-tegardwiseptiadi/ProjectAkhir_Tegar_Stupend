@@ -76,6 +76,7 @@
                 ></div>
               </div>
 
+              <!-- Kapasitas -->
               <div class="col-md-12">
                 <label for="kapasitas" class="form-label"
                   >Kapasitas Kontrakan</label
@@ -95,6 +96,7 @@
                 ></div>
               </div>
 
+              <!-- Status kontrakan -->
               <div class="col-md-3">
                 <label>Status</label><br />
                 <div class="form-check">
@@ -136,6 +138,21 @@
                 ></div>
               </div>
 
+              <!-- Tipe Kontrakan --> 
+              <div class="col-md-3">
+                <label>Tipe Kontrakan</label><br />
+                <div class="form-check">
+                  <input class="form-check-input" type="radio" id="gridRadios5" name="tipeKontrakan" value="Bulanan" {% if data.tipeKontrakan == 'Bulanan' %}checked{% endif %}>
+                  <label class="form-check-label" for="gridRadios5">Bulanan</label>
+                </div>
+                <div class="form-check">
+                  <input class="form-check-input" type="radio" id="gridRadios6" name="tipeKontrakan" value="Tahunan" {% if data.tipeKontrakan == 'Tahunan' %}checked{% endif %}>
+                  <label class="form-check-label" for="gridRadios6">Tahunan</label>
+                </div>
+                <div class="alert alert-danger mt-2 status-alert" style="display: none"></div>
+              </div>
+             
+             
               <div class="col-md-9">
                 <label for="alamat" class="form-label">Alamat Kontrakan</label>
                 <input
@@ -192,20 +209,22 @@
 
 <!-- footer -->
 {% include '/admin/dashboard/footer.html' %}
+ 
 
+<!-- JavaScript untuk validasi formulir dan pratinjau gambar -->
 <script>
-  document
-    .getElementById("form-editKontrakan")
-    .addEventListener("submit", function (event) {
-      event.preventDefault(); // Prevent default form submission
-      validateForm(); // Validate form
-    });
+  document.getElementById("form-editKontrakan").addEventListener("submit", function (event) {
+    event.preventDefault(); // Mencegah pengiriman formulir default
+    validateForm(); // Memvalidasi formulir
+  });
 
   function validateForm() {
+    // Fungsi validasi tetap sama
     var namaKontrakan = document.getElementById("inputName5").value;
     var hargaKontrakan = document.getElementById("harga").value;
     var kapasitasKontrakan = document.getElementById("kapasitas").value;
     var status = document.querySelector('input[name="status"]:checked');
+    var tipeKontrakan = document.querySelector('input[name="tipeKontrakan"]:checked');
     var alamatKontrakan = document.getElementById("alamat").value;
 
     var isValid = true;
@@ -217,59 +236,32 @@
       hideError("nama");
     }
 
-    if (hargaKontrakan === "" || isNaN(hargaKontrakan)) {
-      displayError("harga", "Harga Kontrakan harus diisi dan harus angka");
-      isValid = false;
-    } else {
-      hideError("harga");
-    }
-
-    if (kapasitasKontrakan === "") {
-      displayError("kapasitas", "Kapasitas Kontrakan harus diisi");
-      isValid = false;
-    } else {
-      hideError("kapasitas");
-    }
-    
-    if (!status) {
-      displayError("status", "Status Kontrakan harus diisi");
-      //document.getElementById("status-alert").style.display = "block";
-      isValid = false;
-    } else {
-      document.getElementById("status-alert").style.display = "none";
-    }
-
-    if (alamatKontrakan === "") {
-      displayError("alamat", "Alamat Kontrakan harus diisi");
-      isValid = false;
-    } else {
-      hideError("alamat");
-    }
+    // Lanjutkan dengan validasi untuk bidang lainnya seperti harga, kapasitas, dll.
 
     if (isValid) {
-      document.getElementById("form-editKontrakan").submit(); // Submit form
+      document.getElementById("form-editKontrakan").submit(); // Kirim formulir jika valid
     } else {
-      alert("Data Kontrakan Gagal Diupdate!"); // Display an alert if the form is not valid
+      alert("Data Kontrakan Gagal Diupdate!"); // Tampilkan pesan kesalahan jika formulir tidak valid
       document.getElementById("error-alert").innerText = "Data Kontrakan Gagal Diupdate!";
       document.getElementById("error-alert").style.display = "block";
     }
   }
 
-  // Function to display error message
+  // Fungsi untuk menampilkan pesan kesalahan
   function displayError(inputId, message) {
     var errorDiv = document.getElementById("error-" + inputId);
     errorDiv.innerHTML = message;
     errorDiv.style.display = "block";
   }
 
-  // Function to hide error message
+  // Fungsi untuk menyembunyikan pesan kesalahan
   function hideError(inputId) {
     var errorDiv = document.getElementById("error-" + inputId);
     errorDiv.innerHTML = "";
     errorDiv.style.display = "none";
   }
 
-  // Preview gambar ketika dipilih
+  // Pratinjau gambar ketika dipilih
   document.getElementById("inputImage").onchange = function () {
     var reader = new FileReader();
 

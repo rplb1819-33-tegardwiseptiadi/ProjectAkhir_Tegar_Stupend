@@ -151,6 +151,24 @@
                   Status Penghuni harus dipilih.
                 </div>
               </div>
+
+              <!-- role -->
+              <div class="col-md-6">
+                <label for="inputRole" class="form-label">Role</label>
+                <select class="form-select" name="role" id="inputRole">
+                  <option value="penghuni" {% if user.role == 'penghuni' %}selected{% endif %}>Penghuni</option>
+                  <!-- <option value="admin" {% if user.role == 'admin' %}selected{% endif %}>Admin</option> -->
+                </select>
+                <div
+                id="role-alert"
+                class="alert alert-danger"
+                style="display: none; margin-top: 5px"
+              >
+                Role Penghuni harus dipilih.
+              </div>
+            </div>
+
+                <!-- foto ktp -->
               <div class="col-md-8">
                 <label for="inputKTP" class="form-label">Foto KTP</label>
                 <input
@@ -205,6 +223,8 @@
       var umur = document.getElementById('inputUmur').value;
       var jenisKelamin = document.querySelector('input[name="jenisKelamin"]:checked');
       var status = document.getElementById('inputStatus').value;
+      var role = document.getElementById("inputRole").value;
+    
     
       var isValid = true;
 
@@ -241,6 +261,13 @@
           isValid = false;
       } else {
           document.getElementById('status-alert').style.display = 'none';
+      }
+
+      if (role === "") {
+        document.getElementById("role-alert").style.display = "block";
+        isValid = false;
+      } else {
+        document.getElementById("role-alert").style.display = "none";
       }
  
 
