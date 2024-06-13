@@ -1,0 +1,353 @@
+<!-- Header -->
+{% include '/penyewa/dashboard/header.html' %}
+
+<!-- Sidebar -->
+{% include '/penyewa/dashboard/navbar.html' %}
+
+  <!-- ======= Hero Section ======= -->
+  <section id="hero" class="d-flex align-items-center">
+
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-6 d-flex flex-column justify-content-center pt-4 pt-lg-0 order-2 order-lg-1" data-aos="fade-up" data-aos-delay="200">
+          <h1>Better Solutions For Your Business</h1>
+          <h2>
+            Selamat datang di toko online KUYRAPC! Temukan produk komputer terbaik dengan layanan pelanggan prima. 
+            <br>
+            Terima kasih telah memilih KUYRAPC sebagai mitra Anda dalam pengalaman komputasi yang luar biasa. Selamat berbelanja!
+            </h2>
+          <div class="d-flex justify-content-center justify-content-lg-start" >
+            <a href="{{ url_for('login') }}" class="btn-get-started scrollto" style="margin-bottom: 50px;">Pesan Sekarang</a> 
+          </div>
+        </div>
+        <div class="col-lg-6 order-1 order-lg-2 hero-img" data-aos="zoom-in" data-aos-delay="200">
+          <img src="{{ url_for('static', filename='assets_penghuni/assets_landingpage/img/hero-img.png') }}" class="img-fluid animated" alt="">
+        </div>
+      </div>
+    </div>
+
+  </section><!-- End Hero -->
+
+  <main id="main">
+
+       <!-- ======= Portfolio Section ======= -->
+       <section id="product" class="portfolio">
+        <div class="container" data-aos="fade-up">
+  
+          <div class="section-title">
+            <h2>Product</h2>
+            <p>Temukan produk terlaris di KUYRAPC! Dapatkan kualitas terbaik dan harga terjangkau untuk kebutuhan komputasi Anda. 
+              <br>
+              Jelajahi koleksi kami yang mencakup laptop, PC gaming, komponen hardware, dan aksesori komputer yang paling diminati.
+              <br> 
+              Tawaran terbatas, jadi segera pesan sebelum kehabisan! Raih pengalaman komputasi yang luar biasa dengan produk terlaris dari KUYRAPC. 
+              <br>
+              Belanja sekarang dan nikmati kepuasan tanpa batas!</p>
+          </div>
+  
+          <ul id="portfolio-flters" class="d-flex justify-content-center" data-aos="fade-up" data-aos-delay="100">
+            <li data-filter="*" class="filter-active">All</li>
+            <li data-filter=".filter-app">Laptop</li>
+            <li data-filter=".filter-card">HeadSet</li>
+            <li data-filter=".filter-web">Mouse</li>
+          </ul>
+  
+          <div class="row portfolio-container" data-aos="fade-up" data-aos-delay="200">
+  
+            <div class="col-lg-4 col-md-6 portfolio-item filter-app">
+              <div class="portfolio-img"><img src="assets/img/laptop/Asus-ZenBook-14.jpg" class="img-fluid" alt=""></div>
+              <div class="portfolio-info">
+                <h4>App 1</h4>
+                <p>App</p>
+                <a href="assets/assets_homepage_customer/img/portfolio/portfolio-1.jpg" data-gallery="portfolioGallery" class="portfolio-lightbox preview-link" title="App 1"><i class="bx bx-plus"></i></a>
+                <a href="portfolio-details.html" class="details-link" title="More Details"><i class="bx bx-link"></i></a>
+              </div>
+            </div>
+  
+            <div class="col-lg-4 col-md-6 portfolio-item filter-web">
+              <div class="portfolio-img"><img src="assets/img/mouse/mouse1.png" class="img-fluid" alt=""></div>
+              <div class="portfolio-info">
+                <h4>Web 3</h4>
+                <p>Web</p>
+                <a href="assets/img/mouse/mouse1.png" data-gallery="portfolioGallery" class="portfolio-lightbox preview-link" title="Web 3"><i class="bx bx-plus"></i></a>
+                <a href="portfolio-details.html" class="details-link" title="More Details"><i class="bx bx-link"></i></a>
+              </div>
+            </div>
+  
+            <div class="col-lg-4 col-md-6 portfolio-item filter-app">
+              <div class="portfolio-img"><img src="/assets/img/laptop/laptop-untuk-mahasiswa-2.png" class="img-fluid" alt=""></div>
+              <div class="portfolio-info">
+                <h4>App 2</h4>
+                <p>App</p>
+                <a href="/assets/img/laptop/laptop-untuk-mahasiswa-2.png" data-gallery="portfolioGallery" class="portfolio-lightbox preview-link" title="App 2"><i class="bx bx-plus"></i></a>
+                <a href="portfolio-details.html" class="details-link" title="More Details"><i class="bx bx-link"></i></a>
+              </div>
+            </div>
+  
+            <div class="col-lg-4 col-md-6 portfolio-item filter-card">
+              <div class="portfolio-img"><img src="assets/img/headset/headset3.jpg  " class="img-fluid" alt=""></div>
+              <div class="portfolio-info">
+                <h4>Card 2</h4>
+                <p>Card</p>
+                <a href="assets/img/headset/headset3.jpg  " data-gallery="portfolioGallery" class="portfolio-lightbox preview-link" title="Card 2"><i class="bx bx-plus"></i></a>
+                <a href="portfolio-details.html" class="details-link" title="More Details"><i class="bx bx-link"></i></a>
+              </div>
+            </div>
+  
+            <div class="col-lg-4 col-md-6 portfolio-item filter-web">
+              <div class="portfolio-img"><img src="assets/img/headset/headset2.jpg" class="img-fluid" alt=""></div>
+              <div class="portfolio-info">
+                <h4>Web 2</h4>
+                <p>Web</p>
+                <a href="assets/img/headset/headset2.jpg" data-gallery="portfolioGallery" class="portfolio-lightbox preview-link" title="Web 2"><i class="bx bx-plus"></i></a>
+                <a href="portfolio-details.html" class="details-link" title="More Details"><i class="bx bx-link"></i></a>
+              </div>
+            </div>
+  
+            <div class="col-lg-4 col-md-6 portfolio-item filter-app">
+              <div class="portfolio-img"><img src="/assets/img/laptop/Asus-TUF-vs-ROG-Mana-yang-Lebih-Gacor.jpg" class="img-fluid" alt=""></div>
+              <div class="portfolio-info">
+                <h4>App 3</h4>
+                <p>App</p>
+                <a href="/assets/img/laptop/Asus-TUF-vs-ROG-Mana-yang-Lebih-Gacor.jpg" data-gallery="portfolioGallery" class="portfolio-lightbox preview-link" title="App 3"><i class="bx bx-plus"></i></a>
+                <a href="portfolio-details.html" class="details-link" title="More Details"><i class="bx bx-link"></i></a>
+              </div>
+            </div>
+  
+            <div class="col-lg-4 col-md-6 portfolio-item filter-card">
+              <div class="portfolio-img"><img src="assets/img/headset/headset1.png" class="img-fluid" alt=""></div>
+              <div class="portfolio-info">
+                <h4>Card 1</h4>
+                <p>Card</p>
+                <a href="assets/img/headset/headset1.png" data-gallery="portfolioGallery" class="portfolio-lightbox preview-link" title="Card 1"><i class="bx bx-plus"></i></a>
+                <a href="portfolio-details.html" class="details-link" title="More Details"><i class="bx bx-link"></i></a>
+              </div>
+            </div>
+  
+            <div class="col-lg-4 col-md-6 portfolio-item filter-card">
+              <div class="portfolio-img"><img src="assets/img/headset/headset2.jpg" class="img-fluid" alt=""></div>
+              <div class="portfolio-info">
+                <h4>Card 3</h4>
+                <p>Card</p>
+                <a href="assets/img/headset/headset2.jpg" data-gallery="portfolioGallery" class="portfolio-lightbox preview-link" title="Card 3"><i class="bx bx-plus"></i></a>
+                <a href="portfolio-details.html" class="details-link" title="More Details"><i class="bx bx-link"></i></a>
+              </div>
+            </div>
+  
+            <div class="col-lg-4 col-md-6 portfolio-item filter-web">
+              <div class="portfolio-img"><img src="assets/img/mouse/mouse3.jpg" class="img-fluid" alt=""></div>
+              <div class="portfolio-info">
+                <h4>Web 3</h4>
+                <p>Web</p>
+                <a href="assets/img/mouse/mouse3.jpg" data-gallery="portfolioGallery" class="portfolio-lightbox preview-link" title="Web 3"><i class="bx bx-plus"></i></a>
+                <a href="portfolio-details.html" class="details-link" title="More Details"><i class="bx bx-link"></i></a>
+              </div>
+            </div>
+  
+          </div>
+  
+        </div>
+      </section><!-- End Portfolio Section -->
+  
+
+      
+    <!-- ======= Team Section ======= -->
+    <section id="staff" class="team section-bg">
+      <div class="container" data-aos="fade-up">
+
+        <div class="section-title">
+          <h2>OWNER KONSU</h2>
+          <p>
+            Anda akan dilayani oleh staff terbaik di KUYRAPC! Kami bangga memiliki tim yang berkomitmen untuk menyediakan pelayanan pelanggan yang luar biasa. Dengan pengetahuan yang mendalam dan keahlian di bidangnya, staff kami akan memberikan bantuan yang Anda butuhkan untuk memilih produk dengan tepat, memberikan saran teknis, dan menjamin kepuasan Anda. Percayakan kebutuhan komputasi Anda kepada staff berkualitas terbaik di KUYRAPC dan nikmati pengalaman belanja yang menyenangkan!
+
+          </p>
+        </div>
+
+        <div class="row">
+
+          <div class="col-lg-12" data-aos="zoom-in" data-aos-delay="100" >
+            <div class="member d-flex align-items-start">
+              <div class="pic"><img src="static/assets_homepage_customer/img/team/team-1.jpg" class="img-fluid" alt=""></div>
+              <div class="member-info">
+                <h4>SUPADI </h4>
+                <span>OWNER PROPERTIES</span>
+                <p>Explicabo voluptatem mollitia et repellat qui dolorum quasi</p>
+                <div class="social"> 
+                  <a href=""><i class="ri-instagram-fill"></i></a> 
+                </div>
+              </div>
+            </div>
+        </div>
+
+        </div>
+
+      </div>
+    </section><!-- End Team Section -->
+
+
+
+
+    <!-- ======= About Us Section ======= -->
+    <section id="about" class="about">
+      <div class="container" data-aos="fade-up">
+
+        <div class="section-title">
+          <h2>About Us</h2>
+        </div>
+
+        <div class="row content">
+          <div class="col-lg-6">
+            <p style="text-align: justify;">
+              Selamat datang di KUYRAPC, aplikasi yang menghadirkan pengalaman komputasi terbaik untuk Anda. Kami adalah tim yang berdedikasi untuk menyediakan produk dan layanan berkualitas tinggi di dunia komputer dan teknologi. 
+            </p>
+            <p style="text-align: justify;">
+              Dalam aplikasi KUYRAPC, Anda akan menemukan berbagai pilihan produk komputer, laptop, aksesori, dan perangkat keras terbaru dari merek-merek terkemuka.
+            </p>
+            <p style="text-align: justify;">
+              Kami percaya bahwa teknologi berkualitas tinggi haruslah mudah diakses oleh semua orang. Oleh karena itu, KUYRAPC menyediakan harga yang kompetitif dan penawaran spesial yang menguntungkan bagi pelanggan kami. Selain itu, kami juga memberikan pelayanan pelanggan yang terbaik dengan tim kami yang profesional, ramah, dan siap membantu menjawab pertanyaan serta memberikan saran yang Anda butuhkan.
+            </p>
+           </div>
+
+          <div class="col-lg-6 pt-4 pt-lg-0" style="text-align: justify;">
+            <p>
+              KUYRAPC berkomitmen untuk memberikan pengalaman belanja online yang aman, cepat, dan nyaman. Kami terus mengembangkan aplikasi ini untuk memastikan Anda mendapatkan fitur terbaru, tampilan yang menarik, dan navigasi yang intuitif.
+            </p>
+            <p>
+              Kami sangat menghargai kepercayaan Anda sebagai mitra kami dalam perjalanan komputasi Anda. Dengan KUYRAPC, kami ingin menjadi mitra yang dapat diandalkan dalam memenuhi kebutuhan komputer Anda. Selamat datang di KUYRAPC, aplikasi yang menghadirkan solusi komputer terbaik di ujung jari Anda!
+            </p>
+            <a href="#why" class="btn-learn-more">Why KUYRAPC ?</a>
+          </div>
+        </div>
+
+      </div>
+    </section><!-- End About Us Section -->
+
+    <!-- ======= Why Us Section ======= -->
+    <section id="why" class="why-us section-bg">
+      <div class="container-fluid" data-aos="fade-up">
+        <div class="section-title">
+          <h2>WHY KUYRAPC ?</h2>
+        </div>
+        <div class="row">
+
+          <div class="col-lg-7 d-flex flex-column justify-content-center align-items-stretch  order-2 order-lg-1">
+            <div class="content">
+              <h3>Mengapa menggunakan aplikasi
+                <strong>KUYRAPC ??</strong>
+              </h3>
+              <p>
+                Inilah alasan mengapa Anda tidak ingin melewatkan pengalaman komputasi yang luar biasa :
+              </p>
+            </div>
+
+            <div class="accordion-list">
+              <ul>
+                <li>
+                  <a data-bs-toggle="collapse" class="collapse" data-bs-target="#accordion-list-1"><span>01</span>Pilihan Produk Terlengkap <i class="bx bx-chevron-down icon-show"></i><i class="bx bx-chevron-up icon-close"></i></a>
+                  <div id="accordion-list-1" class="collapse show" data-bs-parent=".accordion-list">
+                    <p>
+                      Dalam aplikasi KUYRAPC, Anda akan menemukan berbagai macam produk komputer, laptop, aksesori, dan perangkat keras terkini. Dengan pilihan yang lengkap, Anda dapat menemukan produk yang sesuai dengan kebutuhan dan preferensi Anda.
+                    </p>
+                    </p>
+                  </div>
+                </li>
+
+                <li>
+                  <a data-bs-toggle="collapse" data-bs-target="#accordion-list-2" class="collapsed"><span>02</span> Harga Kompetitif <i class="bx bx-chevron-down icon-show"></i><i class="bx bx-chevron-up icon-close"></i></a>
+                  <div id="accordion-list-2" class="collapse" data-bs-parent=".accordion-list">
+                    <p>
+                      KUYRAPC menyediakan harga yang kompetitif untuk memastikan Anda mendapatkan nilai terbaik untuk setiap pembelian. Kami menawarkan penawaran spesial dan diskon reguler untuk memberikan penghematan yang signifikan bagi pelanggan kami.
+                    </p>
+                  </div>
+                </li>
+
+                <li>
+                  <a data-bs-toggle="collapse" data-bs-target="#accordion-list-3" class="collapsed"><span>03</span> Keamanan dan Kepercayaan
+                     <i class="bx bx-chevron-down icon-show"></i><i class="bx bx-chevron-up icon-close"></i></a>
+                  <div id="accordion-list-3" class="collapse" data-bs-parent=".accordion-list">
+                    <p>
+                      Kami menjaga keamanan data pribadi Anda dengan standar tertinggi. Aplikasi KUYRAPC dilengkapi dengan langkah-langkah keamanan yang kuat untuk melindungi informasi Anda.
+                    </p>
+                  </div>
+                </li>
+                <li>
+                  <a data-bs-toggle="collapse" data-bs-target="#accordion-list-4" class="collapsed"><span>04</span> Kemudahan Berbelanja
+                     <i class="bx bx-chevron-down icon-show"></i><i class="bx bx-chevron-up icon-close"></i></a>
+                  <div id="accordion-list-4" class="collapse" data-bs-parent=".accordion-list">
+                    <p>
+                      Aplikasi KUYRAPC menawarkan pengalaman berbelanja online yang cepat, nyaman, dan intuitif. Navigasi yang mudah, fitur pencarian canggih, dan antarmuka yang ramah pengguna membuat proses belanja menjadi menyenangkan.
+                    </p>
+                  </div>
+                </li>
+
+              </ul>
+            </div>
+
+          </div> 
+            <div class="col-lg-5 align-items-stretch order-1 order-lg-2 img" 
+            style="background-image: url('{{ url_for('static', filename='assets_penghuni/assets_landingpage/img/hero-img.png') }}')" 
+            data-aos="zoom-in" data-aos-delay="150">
+            &nbsp;
+            </div>
+     
+         
+        </div>
+
+      </div>
+    </section><!-- End Why Us Section -->
+     
+    <!-- ======= Contact Section ======= -->
+    <section id="contact" class="contact">
+      <div class="container" data-aos="fade-up">
+
+        <div class="section-title">
+          <h2>Contact</h2>
+          <p>Magnam dolores commodi suscipit. Necessitatibus eius consequatur ex aliquid fuga eum quidem. Sit sint consectetur velit. Quisquam quos quisquam cupiditate. Et nemo qui impedit suscipit alias ea. Quia fugiat sit in iste officiis commodi quidem hic quas.</p>
+        </div>
+
+        <div class="row">
+
+          <div class="col-lg-5 d-flex align-items-stretch">
+            <div class="info">
+              <div class="address">
+                <i class="bi bi-geo-alt"></i>
+                <h4>Location:</h4>
+                <p>Mall Bekasi Cyber Park,
+                  <br>
+                  Toko KuyRaPC (Kuy Rakit PC)
+                  <br>
+                  Bekasi Cyber Park RT.001, RW.007, Kayuringin Jaya, Kec. Bekasi Barat, Kota Bks, Jawa Barat 17144</p>
+              </div>
+
+              <div class="email">
+                <i class="bi bi-envelope"></i>
+                <h4>Email:</h4>
+                <p>KUYRAPC@gmail.com</p>
+              </div>
+
+              <div class="phone">
+                <i class="bi bi-phone"></i>
+                <h4>Call:</h4>
+                <p>+62 812-9526-4742 (Okky Delfilano)</p>
+                <p>+62 851-5505-0705 (Rifki Arief)</p>
+              </div>
+            </div>
+          </div>
+
+            
+          
+          <div class="col-lg-7 mt-5 mt-lg-0 d-flex align-items-stretch">
+            <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3906.966620357398!2d106.99057576638707!3d-6.245458740548811!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2e698c37f29327b9%3A0xc9c318795dbb5a8!2sBEKASI%20CYBER%20PARK%20MALL!5e0!3m2!1sen!2sid!4v1684936096119!5m2!1sen!2sid" width="600" height="450" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+          </div>
+            
+
+        </div>
+
+      </div>
+    </section><!-- End Contact Section -->
+
+  </main><!-- End #main -->
+
+
+<!-- footer -->
+{% include '/penyewa/dashboard/footer.html' %}

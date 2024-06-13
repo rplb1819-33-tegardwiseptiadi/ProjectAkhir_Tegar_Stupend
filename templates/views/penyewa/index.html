@@ -1,0 +1,231 @@
+<!-- Header -->
+{% include '/penyewa/dashboard/header.html' %}
+
+<!-- Sidebar -->
+{% include '/penyewa/dashboard/navbar_homepage.html' %}
+
+<!-- Start main  -->
+<main id="main">
+  <section id="dashboard" class="container">
+    <div class="row">
+      <div class="pagetitle">
+        <h1>Dashboard</h1>
+        <nav>
+          <ol class="breadcrumb">
+            <li class="breadcrumb-item">
+              <a href="{{ url_for('views.homepage') }}">Dashboard</a>
+            </li>
+          </ol>
+        </nav>
+      </div>
+      <!-- End Page Title -->
+
+      <!-- Left side columns -->
+      <div class="col-lg-5">
+        <div class="row">
+          <!-- Kontrakan Card -->
+          <div class="col-md-12 mb-12">
+            <div class="card info-card sales-card">
+              <div class="card-body">
+                <h5 class="card-title">Total <span>| Kontrakan</span></h5>
+                <div class="d-flex align-items-center">
+                  <div
+                    class="card-icon rounded-circle d-flex align-items-center justify-content-center"
+                  >
+                    <i class="bi bi-cart"></i>
+                  </div>
+                  <div class="ps-3">
+                    <h6>{{ kontrakan_count }} Kontrakan</h6>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- End Kontrakan Card -->
+
+          <!-- Keluhan Card -->
+          <div class="col-md-12 mb-12">
+            <div class="card info-card customers-card">
+              <div class="card-body">
+                <h5 class="card-title">Total <span>| Keluhan</span></h5>
+                <div class="d-flex align-items-center">
+                  <div
+                    class="card-icon rounded-circle d-flex align-items-center justify-content-center"
+                  >
+                    <i class="bi bi-people"></i>
+                  </div>
+                  <div class="ps-3">
+                    <h6>{{ keluhan_count }} Keluhan</h6>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- End Keluhan Card -->
+
+          <!-- Transaksi Card -->
+          <div class="col-md-12 mb-12">
+            <div class="card info-card revenue-card">
+              <div class="card-body">
+                <h5 class="card-title">Total <span>| Transaksi</span></h5>
+                <div class="d-flex align-items-center">
+                  <div
+                    class="card-icon rounded-circle d-flex align-items-center justify-content-center"
+                  >
+                    <i class="bi bi-currency-dollar"></i>
+                  </div>
+                  <div class="ps-3">
+                    <h6>{{ transaksi_total }}</h6>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- End Transaksi Card -->
+
+          <!-- Penghuni Card -->
+          <div class="col-md-12 mb-12">
+            <div class="card info-card customers-card">
+              <div class="card-body">
+                <h5 class="card-title">Total <span>| Penghuni</span></h5>
+                <div class="d-flex align-items-center">
+                  <div
+                    class="card-icon rounded-circle d-flex align-items-center justify-content-center"
+                  >
+                    <i class="bi bi-people"></i>
+                  </div>
+                  <div class="ps-3">
+                    <h6>{{ penghuni_count }} Penghuni</h6>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- End Penghuni Card -->
+        </div>
+      </div>
+
+      <!-- Right side columns -->
+      <div class="col-lg-7">
+        <div class="card recent-sales overflow-auto">
+          <div class="card-body">
+            <h5 class="card-title">Riwayat Keluhan Penghuni</h5>
+
+            <table id="example" class="table table-borderless datatable">
+              <thead>
+                <tr>
+                  <th scope="col">No</th>
+                  <th scope="col">Gambar</th>
+                  <th scope="col">Nama</th>
+                  <th scope="col">Kontrakan</th>
+                  <th scope="col">Tgl</th>
+                  <th scope="col">Status</th>
+                  <th scope="col">Keluhan</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for keluhan in data_keluhan %}
+                <tr>
+                    <td scope="row">{{ loop.index }}</td>
+                    <td>
+                      <img
+                      src="{{ url_for('static', filename=keluhan.gambar_keluhan.split('static/')[-1].replace('\\', '/')) }}"
+                      alt="Gambar Transaksi"
+                      class="img-fluid"
+                      style="max-width: 150px; max-height: 150px"
+                      />
+                  </td>
+                    <td>{{ keluhan.nama_penghuni }}</td>
+                    <td>{{ keluhan.nama_kontrakan }}</td>
+                    <td>{{ keluhan.tgl_keluhan }}</td>
+                    <td>{{ keluhan.keluhan_penghuni }}</td>
+                    <td>
+                        {% if keluhan.status == "Sudah Divalidasi" %}
+                        <button class="btn btn-success">Sudah Divalidasi</button>
+                        {% elif keluhan.status == "Belum Divalidasi" %}
+                        <button class="btn btn-danger">Belum Divalidasi</button>
+                        {% endif %}
+                    </td> 
+                </tr>
+                {% endfor %}
+            </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      <!-- End Right side columns -->
+<!-- Grafik Keluhan -->
+<div class="col-lg-12">
+  <div class="card">
+    <div class="card-body">
+      <h5 class="card-title">Grafik Keluhan</h5>
+      <canvas id="keluhanChart"></canvas>
+    </div>
+  </div>
+</div>
+<!-- End Grafik Keluhan -->
+
+<!-- Grafik Transaksi -->
+<div class="col-lg-12">
+  <div class="card">
+    <div class="card-body">
+      <h5 class="card-title">Grafik Transaksi</h5>
+      <canvas id="transaksiChart"></canvas>
+    </div>
+  </div>
+</div>
+<!-- End Grafik Transaksi -->
+
+<!-- footer -->
+{% include '/penyewa/dashboard/footer.html' %}
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+  const keluhanCtx = document.getElementById('keluhanChart').getContext('2d');
+  const keluhanChart = new Chart(keluhanCtx, {
+      type: 'line',
+      data: {
+          labels: {{ months|tojson|safe }},
+          datasets: [{
+              label: 'Keluhan',
+              data: {{ keluhan_per_bulan|tojson|safe }},
+              borderColor: 'rgba(255, 99, 132, 1)',
+              backgroundColor: 'rgba(255, 99, 132, 0.2)',
+              borderWidth: 1
+          }]
+      },
+      options: {
+          responsive: true,
+          scales: {
+              y: {
+                  beginAtZero: true
+              }
+          }
+      }
+  });
+
+  const transaksiCtx = document.getElementById('transaksiChart').getContext('2d');
+  const transaksiChart = new Chart(transaksiCtx, {
+      type: 'line',
+      data: {
+          labels: {{ months|tojson|safe }},
+          datasets: [{
+              label: 'Transaksi',
+              data: {{ transaksi_per_bulan|tojson|safe }},
+              borderColor: 'rgba(54, 162, 235, 1)',
+              backgroundColor: 'rgba(54, 162, 235, 0.2)',
+              borderWidth: 1
+          }]
+      },
+      options: {
+          responsive: true,
+          scales: {
+              y: {
+                  beginAtZero: true
+              }
+            }
+          }
+      });
+    
+    </script>
+    

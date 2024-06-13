@@ -1,0 +1,117 @@
+<!-- Header -->
+{% include '/admin/dashboard/header.html' %}
+
+
+<!-- Sidebar -->
+{% include '/admin/dashboard/sidebar.html' %}
+
+
+<main id="main" class="main">
+
+  <div class="pagetitle">
+    <h1>Kelola Kontrakan</h1>
+    <nav>
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{{ url_for('homepage_admin') }}">Dashboard</a></li>
+        <li class="breadcrumb-item active">Kontrakan</li>
+      </ol>
+    </nav>
+  </div><!-- End Page Title -->
+
+  <section class="section dashboard">
+    <div class="row">
+
+      <!-- Left side columns -->
+      <div class="col-lg-12">
+        <div class="row">
+ 
+          <!-- Recent Sales -->
+          <div class="col-12">
+            <div class="card recent-sales overflow-auto">
+              <div class="card-body">
+                <h5 class="card-title">Data <span>| Kontrakan</span></h5>
+                <div class="btn_tambah">
+                  <a
+                  href="{{ url_for('views.tambah_kontrakan') }}"
+                  class="btn btn-success"
+                >
+                  Tambah Data
+                </a>
+
+                </div>
+
+                <table class="table table-borderless datatable">
+                  <thead>
+                    <tr>
+                      <th scope="col">No</th>
+                      <th scope="col">Gambar</th>
+                      <th scope="col">Nama</th>
+                      <th scope="col">Kapasitas</th>
+                      <th scope="col">Status</th>
+                      <th scope="col">Aksi</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for item in kontrakan %}
+                    <tr>
+                      <td scope="row">{{ loop.index }}</td>
+                      <td>
+                        <img
+                          src="{{ url_for('static', filename='upload/kontrakan/' + item.gambar.split('/')[-1].split('\\')[-1]) }}"
+                          alt="Foto KTP"
+                          class="img-fluid"
+                          style="max-width: 200px"
+                        />
+                      </td>
+                      <td>{{item.nama_kontrakan}}</td>
+                      <td>{{item.kapasitas}} Orang</td>
+                      <td><button class="btn btn-success">{{item.status}}</button></td>
+                      <!-- <td><span class="badge bg-success">Approved</span></td> -->
+                      <td>
+                        <div class="button-container">
+                          <a href="{{ url_for('views.edit_kontrakan', kontrakan_id=item._id) }}" class="btn btn-primary">Edit</a>
+      
+                          <a href="{{ url_for('views.detail_kontrakan', kontrakan_id=item._id) }}" class="btn btn-warning">
+                            <i class="fas fa-eye"></i> Detail
+                        </a>
+                        
+                        <form
+                        action="{{ url_for('views.hapus_kontrakan', kontrakan_id=item._id) }}"
+                        method="POST"
+                        onsubmit="return confirmDelete('{{ item.nama_kontrakan }}')"
+                        style="display:inline"
+                      >
+                        <button type="submit" class="btn btn-danger">Delete</button>
+                      </form>
+
+                        </div>
+
+                      </td>
+
+                    </tr>
+                    {% endfor %}
+
+                  </tbody>
+                </table>
+
+              </div>
+
+            </div>
+          </div><!-- End Recent Sales -->
+
+        </div>
+      </div><!-- End Left side columns -->
+
+    </div>
+  </section>
+
+</main><!-- End #main -->
+
+<!-- footer -->
+{% include '/admin/dashboard/footer.html' %}
+
+<script>
+  function confirmDelete(namaKontrakan) {
+    return confirm('Apakah anda yakin ingin menghapus kontrakan ' + namaKontrakan + '?');
+  }
+</script>

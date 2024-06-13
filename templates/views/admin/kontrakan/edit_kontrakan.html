@@ -1,0 +1,283 @@
+<!-- Header -->
+{% include '/admin/dashboard/header.html' %}
+
+
+<!-- Sidebar -->
+{% include '/admin/dashboard/sidebar.html' %}
+
+
+<main id="main" class="main">
+  <div class="pagetitle">
+    <h1>Edit Kontrakan</h1>
+    <nav>
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{{ url_for('homepage_admin') }}">Dashboard</a></li>
+        <li class="breadcrumb-item"><a href="{{ url_for('views.kontrakan') }}">Kontrakan</a></li>
+         <li class="breadcrumb-item active">Edit Kontrakan</li>
+      </ol>
+    </nav>
+  </div>
+  <!-- End Page Title -->
+
+    <!-- Alert untuk menampilkan pesan error -->
+    <div
+    id="error-alert"
+    class="alert alert-danger mt-2"
+    style="display: none"
+  ></div>
+
+  <section class="section">
+    <div class="row">
+      <div class="col-lg-12">
+        <div class="card">
+          <div class="card-body">
+            <h5 class="card-title">EDIT DATA KONTRAKAN</h5>
+
+            <!-- Multi Columns Form -->
+            <form
+              class="row g-3"
+              id="form-editKontrakan"
+              action="{{ url_for('views.edit_kontrakan', kontrakan_id=data['_id']) }}"
+              method="post"
+              enctype="multipart/form-data"
+            >
+              <div class="col-md-12">
+                <label for="inputName5" class="form-label"
+                  >Nama Kontrakan</label
+                >
+                <input
+                  type="text"
+                  class="form-control"
+                  id="inputName5"
+                  placeholder="Masukkan Nama Kontrakan"
+                  name="nama_kontrakan"
+                  value="{{ data.nama_kontrakan }}"
+                />
+                <div
+                  class="alert alert-danger mt-2"
+                  id="error-nama"
+                  style="display: none"
+                ></div>
+              </div>
+              <div class="col-md-12">
+                <label for="harga" class="form-label">Harga Kontrakan</label>
+                <input
+                  type="number"
+                  class="form-control"
+                  id="harga"
+                  placeholder="Masukkan Harga Kontrakan"
+                  name="harga"
+                  value="{{ data.harga }}"
+                />
+                <div
+                  class="alert alert-danger mt-2"
+                  id="error-harga"
+                  style="display: none"
+                ></div>
+              </div>
+
+              <div class="col-md-12">
+                <label for="kapasitas" class="form-label"
+                  >Kapasitas Kontrakan</label
+                >
+                <input
+                  type="number"
+                  class="form-control"
+                  id="kapasitas"
+                  placeholder="Masukkan Kapasitas Kontrakan"
+                  name="kapasitas"
+                  value="{{ data.kapasitas }}"
+                />
+                <div
+                  class="alert alert-danger mt-2"
+                  id="error-kapasitas"
+                  style="display: none"
+                ></div>
+              </div>
+
+              <div class="col-md-3">
+                <label>Status</label><br />
+                <div class="form-check">
+                  <input class="form-check-input" type="radio" id="gridRadios1"
+                  name="status" value="kosong" {% if data.status == 'kosong'
+                  %}checked{% endif %}>
+                  <label class="form-check-label" for="gridRadios1"
+                    >Kosong</label
+                  >
+                </div>
+                <div class="form-check">
+                  <input class="form-check-input" type="radio" id="gridRadios2"
+                  name="status" value="booking" {% if data.status == 'booking'
+                  %}checked{% endif %}>
+                  <label class="form-check-label" for="gridRadios2"
+                    >Booking</label
+                  >
+                </div>
+                <div class="form-check">
+                  <input class="form-check-input" type="radio" id="gridRadios3"
+                  name="status" value="penuh" {% if data.status == 'penuh'
+                  %}checked{% endif %}>
+                  <label class="form-check-label" for="gridRadios3"
+                    >Penuh</label
+                  >
+                </div>
+                <div class="form-check">
+                  <input class="form-check-input" type="radio" id="gridRadios4"
+                  name="status" value="diperbaiki" {% if data.status ==
+                  'diperbaiki' %}checked{% endif %}>
+                  <label class="form-check-label" for="gridRadios4"
+                    >Diperbaiki</label
+                  >
+                </div>
+                <div
+                  class="alert alert-danger mt-2"
+                  id="status-alert"
+                  style="display: none"
+                ></div>
+              </div>
+
+              <div class="col-md-9">
+                <label for="alamat" class="form-label">Alamat Kontrakan</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="alamat"
+                  placeholder="Masukkan Alamat Kontrakan"
+                  name="alamat"
+                  value="{{ data.alamat }}"
+                />
+                <div
+                  class="alert alert-danger mt-2"
+                  id="error-alamat"
+                  style="display: none"
+                ></div>
+              </div>
+
+              <div class="col-md-8">
+                <label for="inputImage" class="form-label"
+                  >Foto Kontrakan</label
+                >
+                <img
+                  id="image-preview"
+                  src="{{ url_for('static', filename='upload/kontrakan/' + data.gambar.split('/')[-1]) }}"
+                  alt="Preview"
+                  style="max-width: 200px; margin-top: 10px"
+                />
+                <input
+                  type="file"
+                  class="form-control"
+                  id="inputImage"
+                  name="image"
+                />
+              </div>
+
+            
+              <div class="text-center mt-3">
+                <button type="submit" class="btn btn-primary">Update Data</button>
+                <a
+                  href="{{ url_for('views.kontrakan') }}"
+                  class="btn btn-danger"
+                  >Kembali</a
+                >
+              </div>
+            </form>
+            <!-- End Multi Columns Form -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+<!-- End #main -->
+
+<!-- footer -->
+{% include '/admin/dashboard/footer.html' %}
+
+<script>
+  document
+    .getElementById("form-editKontrakan")
+    .addEventListener("submit", function (event) {
+      event.preventDefault(); // Prevent default form submission
+      validateForm(); // Validate form
+    });
+
+  function validateForm() {
+    var namaKontrakan = document.getElementById("inputName5").value;
+    var hargaKontrakan = document.getElementById("harga").value;
+    var kapasitasKontrakan = document.getElementById("kapasitas").value;
+    var status = document.querySelector('input[name="status"]:checked');
+    var alamatKontrakan = document.getElementById("alamat").value;
+
+    var isValid = true;
+
+    if (namaKontrakan === "") {
+      displayError("nama", "Nama Kontrakan harus diisi");
+      isValid = false;
+    } else {
+      hideError("nama");
+    }
+
+    if (hargaKontrakan === "" || isNaN(hargaKontrakan)) {
+      displayError("harga", "Harga Kontrakan harus diisi dan harus angka");
+      isValid = false;
+    } else {
+      hideError("harga");
+    }
+
+    if (kapasitasKontrakan === "") {
+      displayError("kapasitas", "Kapasitas Kontrakan harus diisi");
+      isValid = false;
+    } else {
+      hideError("kapasitas");
+    }
+    
+    if (!status) {
+      displayError("status", "Status Kontrakan harus diisi");
+      //document.getElementById("status-alert").style.display = "block";
+      isValid = false;
+    } else {
+      document.getElementById("status-alert").style.display = "none";
+    }
+
+    if (alamatKontrakan === "") {
+      displayError("alamat", "Alamat Kontrakan harus diisi");
+      isValid = false;
+    } else {
+      hideError("alamat");
+    }
+
+    if (isValid) {
+      document.getElementById("form-editKontrakan").submit(); // Submit form
+    } else {
+      alert("Data Kontrakan Gagal Diupdate!"); // Display an alert if the form is not valid
+      document.getElementById("error-alert").innerText = "Data Kontrakan Gagal Diupdate!";
+      document.getElementById("error-alert").style.display = "block";
+    }
+  }
+
+  // Function to display error message
+  function displayError(inputId, message) {
+    var errorDiv = document.getElementById("error-" + inputId);
+    errorDiv.innerHTML = message;
+    errorDiv.style.display = "block";
+  }
+
+  // Function to hide error message
+  function hideError(inputId) {
+    var errorDiv = document.getElementById("error-" + inputId);
+    errorDiv.innerHTML = "";
+    errorDiv.style.display = "none";
+  }
+
+  // Preview gambar ketika dipilih
+  document.getElementById("inputImage").onchange = function () {
+    var reader = new FileReader();
+
+    reader.onload = function (e) {
+      document.getElementById("image-preview").src = e.target.result;
+      document.getElementById("image-preview").style.display = "block";
+    };
+
+    reader.readAsDataURL(this.files[0]);
+  };
+</script>

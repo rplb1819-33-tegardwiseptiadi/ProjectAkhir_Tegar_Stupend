@@ -1,0 +1,52 @@
+    <!-- ======= Header ======= -->
+    <header id="header" class="fixed-top" style="background: #37517e">
+        <div class="container d-flex align-items-center">
+            <h1 class="logo me-auto"><a href="{{ url_for('views.homepage') }}">KONSU</a></h1>
+            <!-- Uncomment below if you prefer to use an image logo -->
+            <!-- <a href="index.html" class="logo me-auto"><img src="../../../assets/assets_homepage_customer/img/logo.png" alt="" class="img-fluid"></a> -->
+
+            <nav id="navbar" class="navbar">
+                <ul>
+                    <li><a class="nav-link scrollto active" href="{{ url_for('views.homepage') }}">Dashboard</a></li>
+                    <li><a class="nav-link scrollto" href="{{ url_for('views.penyewa_transaksi') }}">Transaksi</a></li>
+                    <li><a class="nav-link scrollto" href="{{ url_for('views.penyewa_keluhan') }}">Keluhan</a></li>
+                    <li class="dropdown">
+                        <a href="#" class="nav-link scrollto" onclick="toggleDropdown()">Hallo, {{ current_user.nama }}</a>
+                        <div id="dropdown-content" class="dropdown-content"> 
+                            <!-- <a href="#">{{ current_user.role }}</a> -->
+                            <a href="{{ url_for('views.update_account_penghuni', user_id=current_user._id) }}">Edit Account</a>
+
+                            <!-- {% block content %}
+                            <p>User ID: {{ current_user._id }}</p>
+                            <a href="{{ url_for('views.update_account_penghuni', user_id=current_user.id) }}">Edit Account</a>
+                            {% endblock %} -->
+
+                            <!-- Logout link -->
+                            <a href="#" id="logout-link">Log out</a>
+
+                        </div>
+                    </li>
+                </ul>
+                <i class="bi bi-list mobile-nav-toggle"></i>
+            </nav>
+            
+        </div>
+    </header>
+    <!-- End Header -->
+
+    <script>
+        document.getElementById("logout-link").addEventListener("click", function(event) {
+            event.preventDefault(); // Prevent default action
+      
+            // Get the username of the logged-in user
+            var username = "{{ current_user.nama }}"; // Replace with the correct variable for the user's name
+      
+            // Show confirmation alert
+            var confirmation = confirm("Hallo " + username + ", Apakah anda yakin ingin Logout ?");
+      
+            // If the user confirms, redirect to the logout URL
+            if (confirmation) {
+                window.location.href = "{{ url_for('logout') }}";
+            }
+        });
+      </script>
