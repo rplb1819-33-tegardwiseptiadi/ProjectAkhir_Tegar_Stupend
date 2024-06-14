@@ -12,13 +12,9 @@
         <div class="col-lg-6 d-flex flex-column justify-content-center pt-4 pt-lg-0 order-2 order-lg-1" data-aos="fade-up" data-aos-delay="200">
           <h1>Selamat Datang di KONSU</h1>
           <h2>
-            Kami adalah penyedia kontrakan terbaik yang siap memenuhi kebutuhan Anda. 
-            Dengan pengalaman bertahun-tahun dan dedikasi tinggi, 
-            kami berkomitmen untuk memberikan yang terbaik untuk pelanggan kami. 
-            <br>
-            Terima kasih telah memilih KONSU, Jangan lewatkan kesempatan untuk merasakan layanan terbaik dari kami. 
-            Klik tombol di bawah untuk memesan sekarang dan nikmati keuntungan eksklusif untuk pelanggan baru!
-            </h2>
+            Temukan Kontrakan Terbaik Bersama Kami!
+            Dengan pengalaman bertahun-tahun dan dedikasi tinggi, kami berkomitmen untuk memenuhi semua kebutuhan Anda. 
+           </h2> 
           <div class="d-flex justify-content-center justify-content-lg-start" >
             <a href="{{ url_for('login') }}" class="btn-get-started scrollto" style="margin-bottom: 50px;">Pesan Sekarang</a> 
           </div>
@@ -56,51 +52,30 @@
 
     <div class="row portfolio-container" data-aos="fade-up" data-aos-delay="200">
       {% for kontrakan in kontrakan_list %}
-          {% if kontrakan.tipeKontrakan == "Tahunan" %}
-              <div class="col-lg-4 col-md-6 portfolio-item filter-tahunan">
-                  <div class="portfolio-img"><img src="{{ url_for('static', filename='upload/kontrakan/' + kontrakan.gambar) }}" class="img-fluid portfolio-image" style="width: 340px; height: 300px; border-radius: 5px; box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);" alt=""></div>
-                  <div class="portfolio-info">
-                      <h4>{{ kontrakan.nama_kontrakan }}</h4>
-                      <p>{{ kontrakan.tipeKontrakan }}</p>
-                      {% if 'formatted_harga' in kontrakan %}
-                          <p>{{ kontrakan.formatted_harga }}</p>
-                      {% else %}
-                          <p>{{ kontrakan.harga }}</p>
-                      {% endif %}
-                      <a href="{{ url_for('login') }}" class="details-link" title="More Details"><i class="bx bx-fade-right-hover bxs-right-arrow-circle bx-md"></i></i></a>
-                  </div>
+          <div class="col-lg-4 col-md-6 portfolio-item filter-{{ kontrakan.tipeKontrakan|lower }}">
+              <div class="portfolio-img">
+                  <img src="{{ url_for('static', filename='upload/kontrakan/' + kontrakan.gambar) }}" class="img-fluid" alt="" style=" width: 100%;
+                  height: 300px;
+                  object-fit: cover;
+                  border-radius: 5px;
+                  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);">
               </div>
-          {% elif kontrakan.tipeKontrakan == "Bulanan" %}
-              <div class="col-lg-4 col-md-6 portfolio-item filter-bulanan">
-                  <div class="portfolio-img"><img src="{{ url_for('static', filename='upload/kontrakan/' + kontrakan.gambar) }}" class="img-fluid portfolio-image" style="width: 340px; height: 300px; border-radius: 5px; box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);" alt=""></div>
-                  <div class="portfolio-info">
-                      <h4>{{ kontrakan.nama_kontrakan }}</h4>
-                      <p>{{ kontrakan.tipeKontrakan }}</p>
-                      {% if 'formatted_harga' in kontrakan %}
-                          <p>{{ kontrakan.formatted_harga }}</p>
-                      {% else %}
-                          <p>{{ kontrakan.harga }}</p>
-                      {% endif %}
-                      <a href="{{ url_for('login') }}" class="details-link" title="More Details"><i class="bx bx-fade-right-hover bxs-right-arrow-circle bx-md"></i></i></a>
-                  </div>
+              <div class="portfolio-info">
+                  <h4>{{ kontrakan.nama_kontrakan }}</h4>
+                  <p>{{ kontrakan.tipeKontrakan }}</p>
+                  {% if 'formatted_harga' in kontrakan %}
+                      <p>{{ kontrakan.formatted_harga }}</p>
+                  {% else %}
+                      <p>{{ kontrakan.harga }}</p>
+                  {% endif %}
+                  <a href="{{ url_for('login') }}" class="details-link" title="More Details">
+                      <i class="bx bx-fade-right-hover bxs-right-arrow-circle bx-md"></i>
+                  </a>
               </div>
-          {% else %}
-              <div class="col-lg-4 col-md-6 portfolio-item">
-                  <div class="portfolio-img"><img src="{{ url_for('static', filename='upload/kontrakan/' + kontrakan.gambar) }}" class="img-fluid portfolio-image" style="width: 340px; height: 300px; border-radius: 5px; box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);" alt=""></div>
-                  <div class="portfolio-info">
-                      <h4>{{ kontrakan.nama_kontrakan }}</h4>
-                      <p>{{ kontrakan.tipeKontrakan }}</p>
-                      {% if 'formatted_harga' in kontrakan %}
-                          <p>{{ kontrakan.formatted_harga }}</p>
-                      {% else %}
-                          <p>{{ kontrakan.harga }}</p>
-                      {% endif %}
-                      <a href="{{ url_for('login') }}" class="details-link" title="More Details"><i class="bx bx-fade-right-hover bxs-right-arrow-circle bx-md"></i></i></a>
-                  </div>
-              </div>
-          {% endif %}
+          </div>
       {% endfor %}
-  </div>
+    </div>
+    
   
     
     

@@ -13,7 +13,7 @@ import secrets
 import locale
 import bcrypt
 import jwt
-import logging 
+import logging  
 
 # Set up logging
 logging.basicConfig(level=logging.DEBUG)
@@ -384,7 +384,6 @@ def penghuni():
     data_penghuni = db.penghuni.find()
     return render_template('views/admin/penghuni/index.html', data_penghuni=data_penghuni)
 
-# Code untuk route tambah_penghuni
 @views_bp.route('/admin/penghuni/tambah_penghuni', methods=['GET', 'POST'])
 @login_required
 @role_required('admin')
@@ -396,20 +395,26 @@ def tambah_penghuni():
         umur = request.form['umur']
         jenisKelamin = request.form['jenisKelamin']
         status = request.form['status']
-        role = request.form['role']  # Tambahan input role
+        role = request.form['role']
         poto_ktp = request.files['poto_ktp']
-        
+
+        if not (email and password and nama and umur and jenisKelamin and status and role and poto_ktp):
+            flash('Semua data wajib diisi', 'error')
+            return redirect(request.url)
+
         if poto_ktp and allowed_file(poto_ktp.filename):
             today = datetime.now()
             my_time = today.strftime('%Y-%m-%d-%H-%M-%S')
             extention = poto_ktp.filename.rsplit('.', 1)[1].lower()
             filename = secure_filename(f'poto_ktp_{my_time}.{extention}')
             namaGambar = os.path.join(app.config["UPLOAD_FOLDER_PENGHUNI"], filename)
+            if not os.path.exists(app.config["UPLOAD_FOLDER_PENGHUNI"]):
+                os.makedirs(app.config["UPLOAD_FOLDER_PENGHUNI"])
             poto_ktp.save(namaGambar)
         else:
             flash('File gambar tidak valid!', 'error')
             return redirect(request.url)
-        
+
         # Hash the password using bcrypt
         pw_hash = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
 
@@ -426,23 +431,23 @@ def tambah_penghuni():
         }
         db.penghuni.insert_one(doc_penghuni)
 
-         
-
+        flash('Data Penghuni Berhasil Ditambahkan!', 'success')
         return redirect(url_for('views.penghuni'))
 
     return render_template('views/admin/penghuni/tambah_penghuni.html')
 
-
-
-# Route for edit_penghuni page
+# Routes edit penghuni
 @views_bp.route('/admin/penghuni/edit_penghuni/<penghuni_id>', methods=['GET', 'POST'])
 @login_required
 @role_required('admin')
 def edit_penghuni(penghuni_id):
     if request.method == 'GET':
         penghuni = db.penghuni.find_one({"_id": ObjectId(penghuni_id)})
-        user = db.users.find_one({"email": penghuni['email']})
-        return render_template('views/admin/penghuni/edit_penghuni.html', penghuni=penghuni, user=user)
+        if not penghuni:
+            flash('Penghuni tidak ditemukan', 'error')
+            return redirect(url_for('views.penghuni'))
+        return render_template('views/admin/penghuni/edit_penghuni.html', penghuni=penghuni)
+    
     elif request.method == 'POST':
         email = request.form['email']
         password = request.form['password']
@@ -459,6 +464,7 @@ def edit_penghuni(penghuni_id):
             'umur': umur,
             'jenisKelamin': jenisKelamin,
             'status': status,
+            'role': role
         }
 
         if password:
@@ -471,29 +477,18 @@ def edit_penghuni(penghuni_id):
             extention = poto_ktp.filename.rsplit('.', 1)[1].lower()
             filename = secure_filename(f'poto_ktp_{my_time}.{extention}')
             namaGambar = os.path.join(app.config["UPLOAD_FOLDER_PENGHUNI"], filename)
+            if not os.path.exists(app.config["UPLOAD_FOLDER_PENGHUNI"]):
+                os.makedirs(app.config["UPLOAD_FOLDER_PENGHUNI"])
             poto_ktp.save(namaGambar)
             update_data['poto_ktp'] = namaGambar
         
         # Update data di collection penghuni
         db.penghuni.update_one({'_id': ObjectId(penghuni_id)}, {"$set": update_data})
-        
-        # Update data di collection users
-        user = db.users.find_one({"email": email})
-        if user:
-            update_user_data = {
-                'email': email,
-                'nama': nama,
-                'role': role,
-            }
-            if password:
-                update_user_data['password'] = pw_hash.decode('utf-8')
 
-            db.users.update_one({'_id': user['_id']}, {"$set": update_user_data})
-        else:
-            flash(f'Pengguna dengan email {email} tidak ditemukan', 'error')
-
-        flash('Penghuni dan pengguna terkait berhasil diperbarui', 'success')
+        flash('Penghuni berhasil diperbarui', 'success')
         return redirect(url_for('views.penghuni'))
+
+
 
 
 #  Route for detail penghuni
@@ -512,9 +507,9 @@ def detail_penghuni(penghuni_id):
         return "Penghuni tidak ditemukan", 404
 
 # Route for hapus_penghuni
+@views_bp.route('/admin/penghuni/hapus_penghuni/<penghuni_id>', methods=['POST'])
 @login_required
 @role_required('admin')
-@views_bp.route('/admin/penghuni/hapus_penghuni/<penghuni_id>', methods=['POST'])
 def hapus_penghuni(penghuni_id):
     try:
         # Dapatkan informasi penghuni untuk menghapus pengguna terkait
@@ -524,13 +519,17 @@ def hapus_penghuni(penghuni_id):
             flash('Penghuni tidak ditemukan', 'error')
             return redirect(url_for('views.penghuni'))
 
+        # Cek apakah penghuni bersangkutan dengan data transaksi
+        transaksi = db.transaksi.find_one({"penghuni_id": ObjectId(penghuni_id)})
+
+        if transaksi:
+            flash('Data penghuni gagal dihapus karena bersangkutan dengan data transaksi', 'error')
+            return redirect(url_for('views.penghuni'))
+
         # Hapus data penghuni
         db.penghuni.delete_one({"_id": ObjectId(penghuni_id)})
-        
-        # Hapus data pengguna yang terkait berdasarkan email atau identifier lainnya
-        db.users.delete_one({"email": penghuni['email']})
 
-        flash('Penghuni dan pengguna terkait berhasil dihapus', 'success')
+        flash('Penghuni berhasil dihapus', 'success')
     except Exception as e:
         flash(f'Error: {str(e)}', 'error')
     return redirect(url_for('views.penghuni'))
@@ -559,7 +558,7 @@ def tambah_kontrakan():
         # Mengambil data dari form
         nama_kontrakan = request.form['nama_kontrakan']
         harga = request.form['harga']
-        status = request.form['status_kontrakan']  # Memperbaiki nama field
+        status = request.form['status_kontrakan']
         alamat = request.form['alamat']
         kapasitas = request.form['kapasitas']
         tipeKontrakan = request.form['tipeKontrakan']
@@ -586,7 +585,6 @@ def tambah_kontrakan():
                 # Simpan file ke direktori yang ditentukan
                 gambar.save(os.path.join(upload_folder, namaGambar))
             else:
-                # Jika file tidak diizinkan, tampilkan pesan error
                 flash('File gambar tidak valid!', 'error')
                 return redirect(request.url)
         else: 
@@ -603,17 +601,16 @@ def tambah_kontrakan():
             'gambar': namaGambar
         }
         
-        # Menyimpan data ke database
-        db.kontrakan.insert_one(doc)
+        try:
+            db.kontrakan.insert_one(doc)
+            flash('Data kontrakan berhasil ditambahkan!', 'success')
+        except Exception as e:
+            flash('Data kontrakan gagal ditambahkan!', 'error')
         
-        # Redirect ke halaman utama setelah berhasil menambahkan kontrakan
         return redirect(url_for('views.kontrakan'))
     
-    # Render halaman tambah kontrakan jika metode adalah GET
     return render_template('views/admin/kontrakan/tambah_kontrakan.html')
 
-
-# routes edit kontrakan
 @views_bp.route('/admin/kontrakan/edit_kontrakan/<kontrakan_id>', methods=['GET', 'POST'])
 @login_required
 @role_required('admin')
@@ -693,14 +690,24 @@ def detail_kontrakan(kontrakan_id):
 @login_required
 @role_required('admin')
 def hapus_kontrakan(kontrakan_id):
-   
-    # Delete - Menghapus kontrakan
+    # Cek apakah kontrakan masih digunakan di transaksi atau keluhan
+    transaksi_terkait = db.transaksi.find_one({'kontrakan_id': ObjectId(kontrakan_id)})
+    keluhan_terkait = db.keluhan.find_one({'kontrakan_id': ObjectId(kontrakan_id)})
+
+    if transaksi_terkait or keluhan_terkait:
+        # Jika ada data transaksi atau keluhan yang terkait, tampilkan pesan error
+        flash("Data Kontrakan Tidak Dapat Dihapus karena masih bersangkutan dengan Data Keluhan dan Data Transaksi", "error")
+        return redirect(url_for('views.kontrakan'))
+
+    # Jika tidak ada data yang terkait, hapus kontrakan
     result = db.kontrakan.delete_one({'_id': ObjectId(kontrakan_id)})
     if result.deleted_count == 1:
+        flash("Kontrakan berhasil dihapus", "success")
         return redirect(url_for('views.kontrakan'))
     else:
-        return "Kontrakan tidak ditemukan atau tidak dapat dihapus", 404
-
+        flash("Kontrakan tidak ditemukan atau tidak dapat dihapus", "error")
+        return redirect(url_for('views.kontrakan'))
+ 
 #  ------------------------ END KONTRAKAN ------------------------ 
 
 
@@ -768,7 +775,6 @@ def transaksi():
     return render_template('views/admin/transaksi/index.html', data_transaksi=data_transaksi)
 
 
-
 # Route for tambah_transaksi page
 @views_bp.route('/admin/transaksi/tambah_transaksi', methods=['GET', 'POST'])
 @login_required
@@ -808,13 +814,20 @@ def tambah_transaksi():
             'status': status,
             'bukti_pembayaran': namaGambar
         }
+        
+        try:
+            db.transaksi.insert_one(doc)
+            # Update status kontrakan menjadi 'Penuh'
+            db.kontrakan.update_one({'_id': ObjectId(kontrakan_id)}, {'$set': {'status': 'Penuh'}})
+            flash('Data Transaksi berhasil ditambahkan!', 'success')
+        except Exception as e:
+            flash('Data Transaksi gagal ditambahkan!', 'error')
 
-        db.transaksi.insert_one(doc)
         return redirect(url_for('views.transaksi'))
 
-    user = db.users.find()
+    penghuni = db.penghuni.find()
     kontrakan = db.kontrakan.find()
-    return render_template('views/admin/transaksi/tambah_transaksi.html', user=user, kontrakan=kontrakan)
+    return render_template('views/admin/transaksi/tambah_transaksi.html', penghuni=penghuni, kontrakan=kontrakan)
 
 
 # Route for detail_transaksi page
@@ -888,6 +901,7 @@ def detail_transaksi(transaksi_id):
         abort(404, description="Transaction not found")
     return render_template('views/admin/transaksi/detail_transaksi.html', transaksi=transaksi)
 
+
 # Route edit transaksi role admin
 @views_bp.route('/admin/transaksi/edit_transaksi/<transaksi_id>', methods=['GET', 'POST'])
 @login_required
@@ -925,7 +939,25 @@ def edit_transaksi(transaksi_id):
             bukti_pembayaran.save(namaGambar)
             update_data['bukti_pembayaran'] = namaGambar
 
-        db.transaksi.update_one({'_id': ObjectId(transaksi_id)}, {'$set': update_data})
+        try:
+            # Fetch the current transaction to get the old kontrakan_id
+            current_transaksi = db.transaksi.find_one({'_id': ObjectId(transaksi_id)})
+            old_kontrakan_id = current_transaksi['kontrakan_id']
+
+            # Update the transaction
+            db.transaksi.update_one({'_id': ObjectId(transaksi_id)}, {'$set': update_data})
+
+            # Set old kontrakan status to 'Kosong' if different from new kontrakan_id
+            if old_kontrakan_id != ObjectId(kontrakan_id):
+                db.kontrakan.update_one({'_id': old_kontrakan_id}, {'$set': {'status': 'Kosong'}})
+
+            # Set new kontrakan status to 'Penuh'
+            db.kontrakan.update_one({'_id': ObjectId(kontrakan_id)}, {'$set': {'status': 'Penuh'}})
+
+            flash('Data Transaksi Berhasil Diupdate!', 'success')
+        except Exception as e:
+            flash('Data Transaksi Gagal Diupdate!', 'error')
+
         return redirect(url_for('views.transaksi'))
 
     try:
@@ -985,6 +1017,7 @@ def edit_transaksi(transaksi_id):
 
     return render_template('views/admin/transaksi/edit_transaksi.html', transaksi=transaksi, penghuni=penghuni, kontrakan=kontrakan)
 
+ 
 
 # Route for hapus_transaksi
 @views_bp.route('/admin/transaksi/hapus_transaksi/<transaksi_id>', methods=['POST'])
@@ -1074,39 +1107,6 @@ def keluhan():
 @role_required('admin')
 def tambah_keluhan():
     if request.method == 'POST':
-        penghuni_id = request.form['penghuni']
-        kontrakan_id = request.form['kontrakan']
-        tgl_keluhan = request.form['tgl_keluhan']
-        status = request.form['status']
-        keluhan_penghuni = request.form['keluhan_penghuni']
-        gambar_keluhan = request.files['gambar_keluhan']
-
-        keluhan_data = {
-            'penghuni_id': ObjectId(penghuni_id),
-            'kontrakan_id': ObjectId(kontrakan_id),
-            'tgl_keluhan': tgl_keluhan,
-            'status': status,
-            'keluhan_penghuni': keluhan_penghuni,
-        }
-
-        if gambar_keluhan and allowed_file(gambar_keluhan.filename):
-            filename = secure_filename(gambar_keluhan.filename)
-            file_path = os.path.join(app.config["UPLOAD_FOLDER_KELUHAN"], filename)
-            gambar_keluhan.save(file_path)
-            keluhan_data['gambar_keluhan'] = file_path
-
-        db.keluhan.insert_one(keluhan_data)
-        return redirect(url_for('views.keluhan'))
-
-    user = db.users.find()
-    kontrakan = db.kontrakan.find()
-    return render_template('views/admin/keluhan/tambah_keluhan.html', user=user, kontrakan=kontrakan)
-
-@views_bp.route('/admin/keluhan/edit_keluhan/<keluhan_id>', methods=['GET', 'POST'])
-@login_required
-@role_required('admin')
-def edit_keluhan(keluhan_id):
-    if request.method == 'POST':
         try:
             penghuni_id = request.form['penghuni']
             kontrakan_id = request.form['kontrakan']
@@ -1115,7 +1115,48 @@ def edit_keluhan(keluhan_id):
             keluhan_penghuni = request.form['keluhan_penghuni']
             gambar_keluhan = request.files['gambar_keluhan']
 
-            update_data = { 
+            keluhan_data = {
+                'penghuni_id': ObjectId(penghuni_id),
+                'kontrakan_id': ObjectId(kontrakan_id),
+                'tgl_keluhan': tgl_keluhan,
+                'status': status,
+                'keluhan_penghuni': keluhan_penghuni,
+            }
+
+            if gambar_keluhan and allowed_file(gambar_keluhan.filename):
+                filename = secure_filename(gambar_keluhan.filename)
+                file_path = os.path.join(app.config["UPLOAD_FOLDER_KELUHAN"], filename)
+                gambar_keluhan.save(file_path)
+                keluhan_data['gambar_keluhan'] = file_path
+
+            db.keluhan.insert_one(keluhan_data)
+            flash('Keluhan berhasil ditambahkan', 'success')
+            return redirect(url_for('views.keluhan'))
+        except Exception as e:
+            flash(f'Error: {str(e)}', 'error')
+            return redirect(url_for('views.tambah_keluhan'))
+
+    penghuni = db.penghuni.find()
+    kontrakan = db.kontrakan.find()
+    return render_template('views/admin/keluhan/tambah_keluhan.html', penghuni=penghuni, kontrakan=kontrakan)
+
+
+# Route for edit_keluhan page (Create new complaint)
+@views_bp.route('/admin/keluhan/edit_keluhan/<keluhan_id>', methods=['GET', 'POST'])
+@login_required
+@role_required('admin')
+def edit_keluhan(keluhan_id):
+    if request.method == 'POST':
+        try:
+            penghuni_id = request.form['penghuni_id']
+            kontrakan_id = request.form['kontrakan']
+            tgl_keluhan = request.form['tgl_keluhan']
+            status = request.form['status']
+            keluhan_penghuni = request.form['keluhan_penghuni']
+            gambar_keluhan = request.files['gambar_keluhan']
+
+            update_data = {
+                'penghuni_id': ObjectId(penghuni_id),
                 'kontrakan_id': ObjectId(kontrakan_id),
                 'tgl_keluhan': tgl_keluhan,
                 'status': status,
@@ -1130,10 +1171,10 @@ def edit_keluhan(keluhan_id):
 
             db.keluhan.update_one({'_id': ObjectId(keluhan_id)}, {'$set': update_data})
             flash('Keluhan berhasil diperbarui', 'success')
-            return redirect(url_for('views.keluhan'))
+            return redirect(url_for('views.keluhan', keluhan_id=keluhan_id, success='True'))
         except Exception as e:
             flash(f'Error: {str(e)}', 'error')
-            return redirect(url_for('views.edit_keluhan', keluhan_id=keluhan_id))
+            return redirect(url_for('views.edit_keluhan', keluhan_id=keluhan_id, success='False'))
 
     try:
         pipeline = [
@@ -1171,6 +1212,7 @@ def edit_keluhan(keluhan_id):
             {
                 '$project': {
                     '_id': 1,
+                    'penghuni_id': 1,  # Ensure penghuni_id is projected
                     'keluhan_penghuni': 1,
                     'tgl_keluhan': 1,
                     'gambar_keluhan': 1,
@@ -1183,19 +1225,17 @@ def edit_keluhan(keluhan_id):
         ]
 
         keluhan = next(db.keluhan.aggregate(pipeline), None)
-        if not keluhan:
-            abort(404, description="Complaint not found")
-        
+        penghuni = db.penghuni.find()
+        kontrakan = db.kontrakan.find()
+
+        return render_template('views/admin/keluhan/edit_keluhan.html', keluhan=keluhan, penghuni=penghuni, kontrakan=kontrakan)
+
     except Exception as e:
         print(f"An error occurred: {e}")
         abort(500, description="Internal Server Error")
-
-    penghuni = db.penghuni.find()
-    kontrakan = db.kontrakan.find()
-
-    return render_template('views/admin/keluhan/edit_keluhan.html', keluhan=keluhan, penghuni=penghuni, kontrakan=kontrakan)
-
  
+ 
+
 # Route for detail_keluhan page (Read specific complaint)
 @views_bp.route('/admin/keluhan/detail_keluhan/<keluhan_id>')
 @login_required
@@ -1273,8 +1313,19 @@ def detail_keluhan(keluhan_id):
 @login_required
 @role_required('admin')
 def hapus_keluhan(keluhan_id):
-    db.keluhan.delete_one({'_id': ObjectId(keluhan_id)})
+    try:
+        keluhan = db.keluhan.find_one({'_id': ObjectId(keluhan_id)})
+        if not keluhan:
+            flash('Keluhan tidak ditemukan', 'error')
+            return redirect(url_for('views.keluhan'))
+        
+        # Hapus data keluhan
+        db.keluhan.delete_one({'_id': ObjectId(keluhan_id)})
+        flash('Keluhan berhasil dihapus', 'success')
+    except Exception as e:
+        flash(f'Error: {str(e)}', 'error')
     return redirect(url_for('views.keluhan'))
+
 
 # -------------------- End Keluhan -----------------------
 
@@ -1419,9 +1470,20 @@ def update_account_penghuni(user_id):
         flash('Akun penghuni dan pengguna terkait berhasil diperbarui', 'success')
         return redirect(url_for('views.update_account_penghuni', user_id=user_id))
 
-
-
 # ------------------------ END UPDATE AKUN PENGHUNI ------------------------
+
+
+# ------------------------ START KONTRAKAN ------------------------
+# routes index kontrakan
+@views_bp.route('/penyewa/kontrakan')
+@login_required
+@role_required('penghuni')
+def penyewa_kontrakan():
+    # Read - Menampilkan daftar kontrakan
+    kontrakan = list(db.kontrakan.find({}))
+    return render_template('views/penyewa/kontrakan/index.html', kontrakan=kontrakan)
+
+# ------------------------ END KONTRAKAN ------------------------
 
 # ------------------------ START KELUHAN ------------------------
 # Route for Keluhan page (Read all complaints)
@@ -1523,6 +1585,7 @@ def tambah_keluhan_penyewa():
                 keluhan_data['gambar_keluhan'] = file_path
 
             db.keluhan.insert_one(keluhan_data)
+            flash('Keluhan berhasil ditambahkan', 'success')
             return redirect(url_for('views.penyewa_keluhan'))
         except Exception as e:
             flash(f'Error: {str(e)}', 'error')
@@ -1558,6 +1621,7 @@ def edit_keluhan_penyewa(keluhan_id):
                 update_data['gambar_keluhan'] = file_path
 
             db.keluhan.update_one({'_id': ObjectId(keluhan_id)}, {'$set': update_data})
+            flash('Keluhan berhasil diperbarui', 'success')
             return redirect(url_for('views.penyewa_keluhan'))
         except Exception as e:
             flash(f'Error: {str(e)}', 'error')
@@ -1726,7 +1790,7 @@ def penyewa_transaksi():
         logging.debug("No transactions found.")
     return render_template('views/penyewa/transaksi/index.html', list_transaksi=data_transaksi)
 
- 
+
 # Route for tambah_transaksi page
 @views_bp.route('/penyewa/transaksi/tambah', methods=['GET', 'POST'])
 @login_required
@@ -1745,7 +1809,6 @@ def tambah_transaksi_penyewa():
             status = request.form['status']
             bukti_pembayaran = request.files['bukti_pembayaran']
 
-            
             if bukti_pembayaran and allowed_file(bukti_pembayaran.filename):
                 today = datetime.now()
                 my_time = today.strftime('%Y-%m-%d-%H-%M-%S')
@@ -1772,9 +1835,12 @@ def tambah_transaksi_penyewa():
             logging.debug(f"Inserting document: {doc}")
 
             db.transaksi.insert_one(doc)
-            logging.debug("Document inserted successfully")
+            # Update status kontrakan menjadi 'Booking'
+            db.kontrakan.update_one({'_id': ObjectId(kontrakan_id)}, {'$set': {'status': 'Booking'}})
+            flash('Data Transaksi berhasil ditambahkan!', 'success')
             return redirect(url_for('views.penyewa_transaksi'))
         except Exception as e:
+            flash('Data Transaksi gagal ditambahkan!', 'error')
             logging.error(f"Error processing form data: {e}")
             return "There was an error processing your request.", 500
 
@@ -1782,7 +1848,8 @@ def tambah_transaksi_penyewa():
     kontrakan = db.kontrakan.find()
     return render_template('views/penyewa/transaksi/tambah_transaksi.html', penghuni=penghuni, kontrakan=kontrakan)
 
-# Route for edit_transaksi penyewa page
+ 
+# Route for edit_transaksi penyewa page 
 @views_bp.route('/penyewa/transaksi/edit/<transaksi_id>', methods=['GET', 'POST'])
 @login_required
 @role_required('penghuni')
@@ -1820,36 +1887,57 @@ def edit_transaksi_penyewa(transaksi_id):
             bukti_pembayaran.save(namaGambar)
             update_data['bukti_pembayaran'] = namaGambar
 
-        db.transaksi.update_one({'_id': ObjectId(transaksi_id)}, {'$set': update_data})
+        try:
+            # Fetch the current transaction to get the old kontrakan_id
+            current_transaksi = db.transaksi.find_one({'_id': ObjectId(transaksi_id)})
+            old_kontrakan_id = current_transaksi['kontrakan_id']
+
+            # Update the transaction
+            db.transaksi.update_one({'_id': ObjectId(transaksi_id)}, {'$set': update_data})
+
+            # Set old kontrakan status to 'Kosong' if different from new kontrakan_id
+            if old_kontrakan_id != ObjectId(kontrakan_id):
+                db.kontrakan.update_one({'_id': old_kontrakan_id}, {'$set': {'status': 'Kosong'}})
+
+            # Set new kontrakan status to 'Booking'
+            db.kontrakan.update_one({'_id': ObjectId(kontrakan_id)}, {'$set': {'status': 'Booking'}})
+
+            flash('Data Transaksi Berhasil Diupdate!', 'success')
+        except Exception as e:
+            flash('Data Transaksi Gagal Diupdate!', 'error')
+
         return redirect(url_for('views.transaksi'))
 
-    transaksi = db.transaksi.aggregate([
-        {
-            '$match': {'_id': ObjectId(transaksi_id)}
-        },
-        {
-            '$lookup': {
-                'from': 'penghuni',
-                'localField': 'penghuni_id',
-                'foreignField': '_id',
-                'as': 'penghuni'
+    try:
+        transaksi = db.transaksi.aggregate([
+            {
+                '$match': {'_id': ObjectId(transaksi_id)}
+            },
+            {
+                '$lookup': {
+                    'from': 'penghuni',
+                    'localField': 'penghuni_id',
+                    'foreignField': '_id',
+                    'as': 'penghuni'
+                }
+            },
+            {
+                '$lookup': {
+                    'from': 'kontrakan',
+                    'localField': 'kontrakan_id',
+                    'foreignField': '_id',
+                    'as': 'kontrakan'
+                }
+            },
+            {
+                '$unwind': '$penghuni'
+            },
+            {
+                '$unwind': '$kontrakan'
             }
-        },
-        {
-            '$lookup': {
-                'from': 'kontrakan',
-                'localField': 'kontrakan_id',
-                'foreignField': '_id',
-                'as': 'kontrakan'
-            }
-        },
-        {
-            '$unwind': '$penghuni'
-        },
-        {
-            '$unwind': '$kontrakan'
-        }
-    ]).next()
+        ]).next()
+    except StopIteration:
+        abort(404, description="Transaction not found")
 
     penghuni = db.penghuni.find()
     kontrakan = db.kontrakan.find()

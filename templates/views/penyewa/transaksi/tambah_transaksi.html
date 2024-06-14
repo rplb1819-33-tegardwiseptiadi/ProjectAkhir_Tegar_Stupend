@@ -87,9 +87,11 @@
                 >
                   <option selected value="">Pilih Kontrakan...</option>
                   {% for k in kontrakan %}
-                  <option value="{{ k._id }}" data-harga="{{ k.harga }}">
-                    {{ k.nama_kontrakan }}
-                  </option>
+                    {% if k.status == 'kosong'%}
+                      <option value="{{ k._id }}" data-harga="{{ k.harga }}">
+                        {{ k.nama_kontrakan }}
+                      </option>
+                    {% endif %}
                   {% endfor %}
                 </select>
                 <div
@@ -474,14 +476,24 @@
     }
 
     if (isValid) {
-      document.getElementById("form-transaksi").submit(); // Submit form
+      Swal.fire({
+        title: 'Success',
+        text: 'Data Transaksi Berhasil Ditambahkan!',
+        icon: 'success',
+        confirmButtonText: 'OK'
+      }).then(() => {
+         document.getElementById("form-transaksi").submit(); // Submit form
+      });
     } else {
-      alert("Data Transaksi Gagal Ditambahkan!"); // Display an alert if the form is not valid
-      document.getElementById("error-alert").innerText =
-        "Data Transaksi Gagal Ditambahkan!";
-      document.getElementById("error-alert").style.display = "block";
+      Swal.fire({
+        title: "Error",
+        text: "Data Transaksi Gagal Ditambahkan!",
+        icon: "error",
+        confirmButtonText: "OK",
+      });   
     }
   }
+
 
   // Preview gambar ketika dipilih
   document.getElementById("inputBuktiPembayaran").onchange = function () {

@@ -1,10 +1,8 @@
 <!-- Header -->
 {% include '/admin/dashboard/header.html' %}
 
-
 <!-- Sidebar -->
 {% include '/admin/dashboard/sidebar.html' %}
-
 
 <main id="main" class="main">
 
@@ -31,13 +29,9 @@
               <div class="card-body">
                 <h5 class="card-title">Data <span>| Kontrakan</span></h5>
                 <div class="btn_tambah">
-                  <a
-                  href="{{ url_for('views.tambah_kontrakan') }}"
-                  class="btn btn-success"
-                >
-                  Tambah Data
-                </a>
-
+                  <a href="{{ url_for('views.tambah_kontrakan') }}" class="btn btn-success">
+                    Tambah Data
+                  </a>
                 </div>
 
                 <table class="table table-borderless datatable">
@@ -66,54 +60,74 @@
                       </td>
                       <td>{{item.nama_kontrakan}}</td>
                       <td>{{item.kapasitas}} Orang</td>
-                      <td>{{item.tipeKontrakan}} </td>
-                      <td><button class="btn btn-success">{{item.status}}</button></td>
-                      <!-- <td><span class="badge bg-success">Approved</span></td> -->
+                      <td>{{item.tipeKontrakan}}</td>
+                      <td>
+                        {% if item.status == 'kosong' %}
+                            <button class="btn btn-success">{{ item.status }}</button>
+                        {% elif item.status == 'Booking' %}
+                            <button class="btn btn-warning">{{ item.status }}</button>
+                        {% elif item.status == 'Penuh' %}
+                            <button class="btn btn-danger">{{ item.status }}</button>
+                        {% elif item.status == 'Diperbaiki' %}
+                            <button class="btn btn-dark">{{ item.status }}</button>
+                        {% else %}
+                            <button class="btn btn-secondary">{{ item.status }}</button> <!-- Default case if needed -->
+                        {% endif %}
+                    </td>
+                    
                       <td>
                         <div class="button-container">
                           <a href="{{ url_for('views.edit_kontrakan', kontrakan_id=item._id) }}" class="btn btn-primary">Edit</a>
-      
                           <a href="{{ url_for('views.detail_kontrakan', kontrakan_id=item._id) }}" class="btn btn-warning">
                             <i class="fas fa-eye"></i> Detail
-                        </a>
-                        
-                        <form
-                        action="{{ url_for('views.hapus_kontrakan', kontrakan_id=item._id) }}"
-                        method="POST"
-                        onsubmit="return confirmDelete('{{ item.nama_kontrakan }}')"
-                        style="display:inline"
-                      >
-                        <button type="submit" class="btn btn-danger">Delete</button>
-                      </form>
-
+                          </a>
+                          <form
+                            action="{{ url_for('views.hapus_kontrakan', kontrakan_id=item._id) }}"
+                            method="POST"
+                            onsubmit="return confirmDelete('{{ item.nama_kontrakan }}')"
+                            style="display:inline"
+                          >
+                            <button type="submit" class="btn btn-danger">Delete</button>
+                          </form>
                         </div>
-
                       </td>
-
                     </tr>
                     {% endfor %}
-
                   </tbody>
                 </table>
-
               </div>
-
             </div>
           </div><!-- End Recent Sales -->
-
         </div>
       </div><!-- End Left side columns -->
-
     </div>
   </section>
-
 </main><!-- End #main -->
 
 <!-- footer -->
 {% include '/admin/dashboard/footer.html' %}
 
+<!-- SweetAlert -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 <script>
   function confirmDelete(namaKontrakan) {
     return confirm('Apakah anda yakin ingin menghapus kontrakan ' + namaKontrakan + '?');
   }
+
+  // SweetAlert for flash messages
+  document.addEventListener('DOMContentLoaded', function() {
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          Swal.fire({
+            title: "{{ 'Error' if category == 'error' else 'Success' }}",
+            text: "{{ message }}",
+            icon: "{{ 'error' if category == 'error' else 'success' }}",
+            confirmButtonText: 'OK'
+          });
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+  });
 </script>

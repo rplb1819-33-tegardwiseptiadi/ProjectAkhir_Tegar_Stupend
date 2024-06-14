@@ -127,7 +127,14 @@
         }
 
         if (isValid) {
+          Swal.fire({
+            title: 'Success',
+            text: 'Data Keluhan Berhasil Diupdate!',
+            icon: 'success',
+            confirmButtonText: 'OK'
+          }).then(() => {
             document.getElementById("form-keluhan").submit(); // Submit form
+          });
         } else {
             alert("Data Keluhan Gagal Diupdate!"); // Display an alert if the form is not valid
         }

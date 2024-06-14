@@ -17,16 +17,6 @@
   </div>
   <!-- End Page Title -->
 
-     <!-- Alert untuk menampilkan pesan error -->
-     <div
-     id="error-alert"
-     class="alert alert-danger mt-2"
-     style="display: none"
-   ></div>
-
-  <!-- Alert untuk menampilkan pesan error -->
-  <div id="error-alert" class="alert alert-danger mt-2" style="display: none"></div>
-
   <section class="section">
     <div class="row justify-content-center">
       <div class="col-lg-10">
@@ -41,7 +31,7 @@
                 <label for="penghuni" class="form-label">Nama Penghuni</label>
                 <select class="form-control" id="penghuni" name="penghuni">
                   <option selected value="">Pilih Penghuni...</option>
-                  {% for p in user %}
+                  {% for p in penghuni %}
                   <option value="{{ p._id }}">{{ p.nama }}</option>
                   {% endfor %}
                 </select>
@@ -91,8 +81,6 @@
                 <div id="gambar_keluhan-alert" class="alert alert-danger mt-2" style="display: none">Gambar keluhan harus dipilih.</div>
               </div>
 
-             
-
               <div class="text-center mt-3">
                 <button type="button" class="btn btn-success" onclick="validateForm()">Tambah Data</button>
                 <a href="{{ url_for('views.keluhan')}}" class="btn btn-danger">Kembali</a>
@@ -110,6 +98,7 @@
 <!-- footer -->
 {% include '/admin/dashboard/footer.html' %}
 
+ 
 <script>
   function validateForm() {
     var penghuni = document.getElementById("penghuni").value;
@@ -165,11 +154,22 @@
     }
 
     if (isValid) {
-      document.getElementById("form-keluhan").submit(); // Submit form
-    } else {
-      alert("Data Keluhan Gagal Ditambahkan!"); // Display an alert if the form is not valid
-      document.getElementById("error-alert").innerText = "Data Keluhan Gagal Ditambahkan!";
-      document.getElementById("error-alert").style.display = "block";
+      Swal.fire({
+        title: 'Success',
+        text: 'Data Keluhan Berhasil Ditambahkan!',
+        icon: 'success',
+        confirmButtonText: 'OK'
+      }).then(() => {
+        document.getElementById("form-keluhan").submit(); // Submit form
+      });
+    } 
+      else {
+      Swal.fire({
+        title: "Error",
+        text: "Data Keluhan Gagal Ditambahkan!",
+        icon: "error",
+        confirmButtonText: "OK",
+      });
     }
   }
 

@@ -97,8 +97,7 @@
 {% include '/penyewa/dashboard/footer.html' %}
 
 <script>
-    function validateForm() {
-        event.preventDefault();
+    function validateForm() { 
 
         var penghuni = document.getElementById("inputPenghuni").value;
         var kontrakan = document.getElementById("kontrakan").value;
@@ -152,12 +151,21 @@
         }
 
         if (isValid) {
-            document.getElementById("form-keluhan").submit(); // Submit form
-        } else {
-           alert("Data Keluhan Gagal Ditambahkan!"); // Display an alert if the form is not valid
-          document.getElementById("error-alert").innerText =
-            "Data Keluhan  Gagal Ditambahkan!";
-          document.getElementById("error-alert").style.display = "block";
+          Swal.fire({
+            title: 'Success',
+            text: 'Data Keluhan Berhasil Ditambahkan!',
+            icon: 'success',
+            confirmButtonText: 'OK'
+          }).then(() => {
+             document.getElementById("form-keluhan").submit(); // Submit form
+          });
+        } else { 
+            Swal.fire({
+              title: "Error",
+              text: "Data Keluhan Gagal Ditambahkan!",
+              icon: "error",
+              confirmButtonText: "OK",
+            });
         }
     }
 

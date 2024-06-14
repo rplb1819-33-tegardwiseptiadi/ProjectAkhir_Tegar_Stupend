@@ -36,7 +36,7 @@
                 <label for="inputPenghuni" class="form-label">Nama Penghuni</label>
                 <select id="inputPenghuni" name="penghuni" class="form-select">
                   <option selected value="">Pilih Penghuni...</option>
-                  {% for p in user %}
+                  {% for p in penghuni %}
                   <option value="{{ p._id }}">{{ p.nama }}</option>
                   {% endfor %}
                 </select>
@@ -50,17 +50,19 @@
                 <div id="tgl_pembayaran-alert" class="alert alert-danger mt-2" style="display: none">Tanggal pembayaran harus diisi.</div>
               </div>
 
-              <!-- Nama Kontrakan -->
               <div class="col-md-10">
                 <label for="inputKontrakan" class="form-label">Nama Kontrakan</label>
                 <select id="inputKontrakan" name="kontrakan" class="form-select">
-                  <option selected value="">Pilih Kontrakan...</option>
-                  {% for k in kontrakan %}
-                  <option value="{{ k._id }}" data-harga="{{ k.harga }}">{{ k.nama_kontrakan }}</option>
-                  {% endfor %}
+                    <option selected value="">Pilih Kontrakan...</option>
+                    {% for k in kontrakan %}
+                        {% if k.status == 'kosong'%}
+                            <option value="{{ k._id }}" data-harga="{{ k.harga }}">{{ k.nama_kontrakan }}</option>
+                        {% endif %}
+                    {% endfor %}
                 </select>
                 <div id="kontrakan-alert" class="alert alert-danger mt-2" style="display: none">Nama kontrakan harus dipilih!!</div>
-              </div>
+            </div>
+            
 
              <!-- Harga Kontrakan -->
               <div class="col-md-5">
@@ -126,11 +128,11 @@
               <!-- Bukti Pembayaran -->
               <div class="col-md-10">
                 <label for="inputBuktiPembayaran" class="form-label">Bukti Pembayaran</label>
-                <input type="file" class="form-control" id="inputBuktiPembayaran" name="bukti_pembayaran" />
-                <div id="bukti_pembayaran-alert" class="alert alert-danger mt-2" style="display: none">Bukti pembayaran harus diunggah.</div>
+                <img id="image-preview" style="display: none; max-width: 200px; max-height: 200px;" />
               </div>
               <div class="col-md-10">
-                <img id="image-preview" style="display: none; max-width: 200px; max-height: 200px;" />
+                <input type="file" class="form-control" id="inputBuktiPembayaran" name="bukti_pembayaran" />
+                <div id="bukti_pembayaran-alert" class="alert alert-danger mt-2" style="display: none">Bukti pembayaran harus diunggah.</div>
               </div>
 
               <div class="text-center">
@@ -304,11 +306,21 @@
     }
 
     if (isValid) {
-      document.getElementById("form-transaksi").submit(); // Submit form
+      Swal.fire({
+        title: 'Success',
+        text: 'Data Transaksi Berhasil Ditambahkan!',
+        icon: 'success',
+        confirmButtonText: 'OK'
+      }).then(() => {
+         document.getElementById("form-transaksi").submit(); // Submit form
+      });
     } else {
-      alert('Data Transaksi Gagal Ditambahkan!'); // Display an alert if the form is not valid
-      document.getElementById("error-alert").innerText = "Data Transaksi Gagal Ditambahkan!";
-      document.getElementById("error-alert").style.display = "block";   
+      Swal.fire({
+        title: "Error",
+        text: "Data Transaksi Gagal Ditambahkan!",
+        icon: "error",
+        confirmButtonText: "OK",
+      });   
     }
   }
 
@@ -324,6 +336,4 @@
     reader.readAsDataURL(this.files[0]);
   };
 
-  // Attach validateForm function to the form's submit event
-  document.getElementById("form-transaksi").addEventListener("submit", validateForm);
-</script>
+  </script>

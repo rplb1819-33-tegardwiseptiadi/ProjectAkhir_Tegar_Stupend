@@ -83,7 +83,7 @@
                             <button
                               type="submit"
                               class="btn btn-danger"
-                              onclick="return confirm('Apakah anda yakin ingin menghapus penghuni {{ penghuni.nama }}?')"
+                              onclick="return confirmDelete('Apakah anda yakin ingin menghapus penghuni {{ penghuni.nama }}?')"
                             >
                               Delete
                             </button>
@@ -108,3 +108,27 @@
 
 <!-- footer -->
 {% include '/admin/dashboard/footer.html' %}
+
+
+<script>
+  function confirmDelete(namaPenghuni) {
+    return confirm('Apakah anda yakin ingin menghapus penghuni ' + namaPenghuni + '?');
+  }
+
+  // SweetAlert for flash messages
+  document.addEventListener('DOMContentLoaded', function() {
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          Swal.fire({
+            title: "{{ 'Error' if category == 'error' else 'Success' }}",
+            text: "{{ message }}",
+            icon: "{{ 'error' if category == 'error' else 'success' }}",
+            confirmButtonText: 'OK'
+          });
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+  });
+</script>
+

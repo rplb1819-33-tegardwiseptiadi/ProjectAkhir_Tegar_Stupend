@@ -33,11 +33,11 @@
             <form id="form-transaksi" class="row g-3" method="POST" action="{{ url_for('views.edit_transaksi', transaksi_id=transaksi._id) }}" enctype="multipart/form-data">
             
              <!-- Nama Penghuni --> 
-<div class="col-md-10">
-  <label for="inputPenghuni" class="form-label">Nama Penghuni</label>
-  <input type="text" class="form-control" id="inputPenghuni" name="penghuni" value="{{ transaksi.penghuni_data.nama }}" readonly /> 
-  <div id="nama-alert" class="alert alert-danger mt-2" style="display: none">Nama penghuni harus dipilih !!!</div>
-</div>
+            <div class="col-md-10">
+              <label for="inputPenghuni" class="form-label">Nama Penghuni</label>
+              <input type="text" class="form-control" id="inputPenghuni" name="penghuni" value="{{ transaksi.penghuni_data.nama }}" readonly /> 
+              <div id="nama-alert" class="alert alert-danger mt-2" style="display: none">Nama penghuni harus dipilih !!!</div>
+            </div>
 
 
               <!-- Tgl Pembayaran -->
@@ -53,7 +53,9 @@
                 <select id="inputKontrakan" name="kontrakan" class="form-select">
                   <option selected value="{{ transaksi.kontrakan._id }}" data-harga="{{ transaksi.kontrakan.harga }}">{{ transaksi.kontrakan.nama_kontrakan }}</option>
                   {% for k in kontrakan %}
+                  {% if k.status == 'kosong'%}
                   <option value="{{ k._id }}" data-harga="{{ k.harga }}">{{ k.nama_kontrakan }}</option>
+                  {% endif %}
                   {% endfor %}
                 </select>
                 <div id="kontrakan-alert" class="alert alert-danger mt-2" style="display: none">Nama kontrakan harus dipilih!!</div>
@@ -285,11 +287,21 @@ function validateForm(event) {
   }
   
   if (isValid) {
-    document.getElementById("form-transaksi").submit(); // Submit form
+    Swal.fire({
+      title: 'Success',
+      text: 'Data Transaksi Berhasil Ditambahkan!',
+      icon: 'success',
+      confirmButtonText: 'OK'
+    }).then(() => {
+       document.getElementById("form-transaksi").submit(); // Submit form
+    });
   } else {
-    alert('Data Transaksi Gagal Diupdate!'); // Display an alert if the form is not valid
-    document.getElementById("error-alert").innerText = "Data Transaksi Gagal Diupdate!";
-    document.getElementById("error-alert").style.display = "block";   
+    Swal.fire({
+      title: "Error",
+      text: "Data Transaksi Gagal Ditambahkan!",
+      icon: "error",
+      confirmButtonText: "OK",
+    });   
   }
 }
 

@@ -102,6 +102,8 @@
 <!-- footer -->
 {% include '/admin/dashboard/footer.html' %}
 
+<!-- SweetAlert -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <script>
   document.getElementById("form-kontrakan").addEventListener("submit", function (event) {
@@ -149,7 +151,12 @@
 
     if (!tipeKontrakan) {
       // If no radio button is checked for tipeKontrakan
-      alert("Pilih Tipe Kontrakan (Tahunan atau Bulanan)");
+      Swal.fire({
+        title: "Error",
+        text: "Pilih Tipe Kontrakan (Tahunan atau Bulanan)",
+        icon: "error",
+        confirmButtonText: "OK"
+      });
       isValid = false;
     }
 
@@ -162,10 +169,22 @@
 
     if (isValid) {
       // Submit form if valid
-      document.getElementById("form-kontrakan").submit();
+      Swal.fire({
+        title: "Success",
+        text: "Data Kontrakan Berhasil Ditambahkan!",
+        icon: "success",
+        confirmButtonText: "OK"
+      }).then(() => {
+        document.getElementById("form-kontrakan").submit();
+      });
     } else {
       // Display error message if not valid
-      alert("Data Kontrakan Gagal Ditambahkan!");
+      Swal.fire({
+        title: "Error",
+        text: "Data Kontrakan Gagal Ditambahkan!",
+        icon: "error",
+        confirmButtonText: "OK"
+      });
       document.getElementById("error-alert").innerText = "Data Kontrakan Gagal Ditambahkan!";
       document.getElementById("error-alert").style.display = "block";
     }

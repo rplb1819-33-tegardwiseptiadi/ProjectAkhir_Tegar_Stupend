@@ -188,9 +188,21 @@
     }
 
     if (isValid) {
-      document.getElementById("form-penghuni").submit(); // Submit form
+      Swal.fire({
+        title: 'Success',
+        text: 'Data Penghuni Berhasil Ditambahkan!',
+        icon: 'success',
+        confirmButtonText: 'OK'
+      }).then(() => {
+        document.getElementById("form-penghuni").submit();
+      });
     } else {
-      alert('Data Penghuni Gagal Ditambahkan!'); // Display an alert if the form is not valid
+      Swal.fire({
+        title: 'Error',
+        text: 'Data Penghuni Gagal Ditambahkan!',
+        icon: 'error',
+        confirmButtonText: 'OK'
+      });
       document.getElementById("error-alert").innerText = "Data Penghuni Gagal Ditambahkan!";
       document.getElementById("error-alert").style.display = "block";
     }

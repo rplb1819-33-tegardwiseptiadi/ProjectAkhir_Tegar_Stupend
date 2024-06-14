@@ -31,10 +31,13 @@
             <form class="row g-3" id="form-keluhan" action="{{ url_for('views.edit_keluhan', keluhan_id=keluhan._id) }}" method="post" enctype="multipart/form-data">
               
               <div class="col-md-6">
-                <label for="inputPenghuni" class="form-label">Nama Penghuni</label>
-                <input type="text" class="form-control" id="inputPenghuni" name="penghuni" value="{{ keluhan.nama_penghuni }}" readonly /> 
-                <div id="nama-alert" class="alert alert-danger mt-2" style="display: none">Nama penghuni harus dipilih !!!</div>
-              </div>
+                <label for="penghuni" class="form-label">Nama Penghuni</label>
+                <input type="text" class="form-control" id="penghuni" name="penghuni" value="{{ keluhan.nama_penghuni }}" readonly /> 
+                <!-- Input type hidden untuk menyimpan ID penghuni -->
+                <input type="hidden" id="penghuni_id" name="penghuni_id" value="{{ keluhan.penghuni_id }}">
+                <div id="penghuni-alert" class="alert alert-danger mt-2" style="display: none">Nama penghuni harus dipilih !!!</div>
+            </div>
+            
               <div class="col-md-6">
                 <label for="kontrakan" class="form-label">Nama Kontrakan</label>
                 <select class="form-control" id="kontrakan" name="kontrakan">
@@ -74,21 +77,20 @@
               <div class="col-md-12">
                 <label for="gambar_keluhan" class="form-label">Gambar Keluhan</label>
                 <img class="form-control"
-                id="image-preview"
-                src="{{ url_for('static', filename='upload/keluhan/' + keluhan.gambar_keluhan.split('/')[-1].split('\\')[-1]) }}"
-                alt="image-Preview"
-                style="max-width: 100%; max-width: 200px; margin-top: 10px"
-              />
+                     id="image-preview"
+                     src="{{ url_for('static', filename='upload/keluhan/' + keluhan.gambar_keluhan.split('/')[-1].split('\\')[-1]) }}"
+                     alt="image-Preview"
+                     style="max-width: 100%; max-width: 200px; margin-top: 10px"
+                />
               </div>
               
               <div class="col-md-10">
                 <input type="file" class="form-control" id="gambar_keluhan" name="gambar_keluhan" accept="image/*">
-                  <div id="gambar_keluhan-alert" class="alert alert-danger mt-2" style="display: none">Gambar keluhan harus dipilih.</div>
+                <div id="gambar_keluhan-alert" class="alert alert-danger mt-2" style="display: none">Gambar keluhan harus dipilih.</div>
               </div>
               
-              
               <div class="text-center mt-3">
-                <button type="button" class="btn btn-primary" onclick="validateForm()">Simpan Perubahan</button>
+                <button type="button" class="btn btn-primary" onclick="validateForm()" >Update Data</button>
                 <a href="{{ url_for('views.keluhan') }}" class="btn btn-danger">Kembali</a>
               </div>
             </form>
@@ -104,17 +106,22 @@
 <!-- footer -->
 {% include '/admin/dashboard/footer.html' %}
 
+
 <script>
+
+  document.getElementById("form-keluhan").addEventListener("submit", function (event) {
+    event.preventDefault(); // Prevent default form submission
+    validateForm(); // Validate form
+  });
+
   function validateForm() { 
     var kontrakan = document.getElementById("kontrakan").value;
     var tgl_keluhan = document.getElementById("tgl_keluhan").value;
     var status1 = document.getElementById("status1").checked;
     var status2 = document.getElementById("status2").checked;
-    var gambar_keluhan = document.getElementById("gambar_keluhan").value;
     var keluhan_penghuni = document.getElementById("keluhan_penghuni").value;
 
     var isValid = true;
- 
 
     if (kontrakan === "") {
       document.getElementById("kontrakan-alert").style.display = "block";
@@ -145,9 +152,21 @@
     }
 
     if (isValid) {
-      document.getElementById("form-keluhan").submit(); // Submit form
+      Swal.fire({
+        title: 'Success',
+        text: 'Data Keluhan Berhasil Diupdate!',
+        icon: 'success',
+        confirmButtonText: 'OK'
+      }).then(() => {
+        document.getElementById("form-keluhan").submit(); // Submit form
+      });
     } else {
-      alert("Data Keluhan Gagal Diupdate!"); // Display an alert if the form is not valid
+      Swal.fire({
+        title: "Error",
+        text: "Data Keluhan Gagal Diupdate!",
+        icon: "error",
+        confirmButtonText: "OK",
+      });
       document.getElementById("error-alert").innerText = "Data Keluhan Gagal Diupdate!";
       document.getElementById("error-alert").style.display = "block";
     }
@@ -164,4 +183,6 @@
 
     reader.readAsDataURL(this.files[0]);
   };
+
+   
 </script>

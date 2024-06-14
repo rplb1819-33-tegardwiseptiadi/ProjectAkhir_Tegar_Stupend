@@ -156,8 +156,8 @@
               <div class="col-md-6">
                 <label for="inputRole" class="form-label">Role</label>
                 <select class="form-select" name="role" id="inputRole">
-                  <option value="penghuni" {% if user.role == 'penghuni' %}selected{% endif %}>Penghuni</option>
-                  <!-- <option value="admin" {% if user.role == 'admin' %}selected{% endif %}>Admin</option> -->
+                  <option value="penghuni" {% if penghuni.role == 'penghuni' %}selected{% endif %}>Penghuni</option>
+                  <!-- <option value="admin" {% if penghuni.role == 'admin' %}selected{% endif %}>Admin</option> -->
                 </select>
                 <div
                 id="role-alert"
@@ -212,83 +212,95 @@
 
 <script>
   document.getElementById("form-penghuni").addEventListener("submit", function(event) {
-      event.preventDefault(); // Prevent default form submission
-      
-      validateForm(); // Validate form
+    event.preventDefault(); // Prevent default form submission
+    
+    validateForm(); // Validate form
   });
 
   function validateForm() {
-      var nama = document.getElementById('inputName').value;
-      var email = document.getElementById('inputEmail').value; 
-      var umur = document.getElementById('inputUmur').value;
-      var jenisKelamin = document.querySelector('input[name="jenisKelamin"]:checked');
-      var status = document.getElementById('inputStatus').value;
-      var role = document.getElementById("inputRole").value;
-    
-    
-      var isValid = true;
+    var nama = document.getElementById('inputName').value;
+    var email = document.getElementById('inputEmail').value; 
+    var umur = document.getElementById('inputUmur').value;
+    var jenisKelamin = document.querySelector('input[name="jenisKelamin"]:checked');
+    var status = document.getElementById('inputStatus').value;
+    var role = document.getElementById("inputRole").value;
 
-      if (nama === '') {
-          document.getElementById('nama-alert').style.display = 'block';
-          isValid = false;
-      } else {
-          document.getElementById('nama-alert').style.display = 'none';
-      }
+    var isValid = true;
 
-      if (email === '') {
-          document.getElementById('email-alert').style.display = 'block';
-          isValid = false;
-      } else {
-          document.getElementById('email-alert').style.display = 'none';
-      }
-  
-      if (umur === '') {
-          document.getElementById('umur-alert').style.display = 'block';
-          isValid = false;
-      } else {
-          document.getElementById('umur-alert').style.display = 'none';
-      }
+    if (nama === '') {
+      document.getElementById('nama-alert').style.display = 'block';
+      isValid = false;
+    } else {
+      document.getElementById('nama-alert').style.display = 'none';
+    }
 
-      if (!jenisKelamin) {
-          document.getElementById('jk-alert').style.display = 'block';
-          isValid = false;
-      } else {
-          document.getElementById('jk-alert').style.display = 'none';
-      }
+    if (email === '') {
+      document.getElementById('email-alert').style.display = 'block';
+      isValid = false;
+    } else {
+      document.getElementById('email-alert').style.display = 'none';
+    }
 
-      if (status === '') {
-          document.getElementById('status-alert').style.display = 'block';
-          isValid = false;
-      } else {
-          document.getElementById('status-alert').style.display = 'none';
-      }
+    if (umur === '') {
+      document.getElementById('umur-alert').style.display = 'block';
+      isValid = false;
+    } else {
+      document.getElementById('umur-alert').style.display = 'none';
+    }
 
-      if (role === "") {
-        document.getElementById("role-alert").style.display = "block";
-        isValid = false;
-      } else {
-        document.getElementById("role-alert").style.display = "none";
-      }
- 
+    if (!jenisKelamin) {
+      document.getElementById('jk-alert').style.display = 'block';
+      isValid = false;
+    } else {
+      document.getElementById('jk-alert').style.display = 'none';
+    }
 
-      if (isValid) { 
-          document.getElementById("form-penghuni").submit(); // Submit form
-      } else {
-          alert('Data Penghuni Gagal Diupdate!'); // Display an alert if the form is not valid
-          document.getElementById("error-alert").innerText = "Data Penghuni Gagal Diupdate!";
-          document.getElementById("error-alert").style.display = "block";
-      }
+    if (status === '') {
+      document.getElementById('status-alert').style.display = 'block';
+      isValid = false;
+    } else {
+      document.getElementById('status-alert').style.display = 'none';
+    }
+
+    if (role === "") {
+      document.getElementById("role-alert").style.display = "block";
+      isValid = false;
+    } else {
+      document.getElementById("role-alert").style.display = "none";
+    }
+
+    if (isValid) { 
+      Swal.fire({
+        title: 'Success',
+        text: 'Data Penghuni Berhasil Diupdate!',
+        icon: 'success',
+        confirmButtonText: 'OK'
+      }).then(() => {
+        document.getElementById("form-penghuni").submit(); // Submit form
+      });
+    } else {
+      Swal.fire({
+        title: 'Error',
+        text: 'Data Penghuni Gagal Diupdate!',
+        icon: 'error',
+        confirmButtonText: 'OK'
+      });
+      document.getElementById("error-alert").innerText = "Data Penghuni Gagal Diupdate!";
+      document.getElementById("error-alert").style.display = "block";
+    }
   }
 
   // Preview gambar ketika dipilih
   document.getElementById("inputKTP").onchange = function () {
-      var reader = new FileReader();
+    var reader = new FileReader();
 
-      reader.onload = function (e) {
-          document.getElementById("preview").src = e.target.result;
-          document.getElementById("preview").style.display = "block";
-      };
+    reader.onload = function (e) {
+      document.getElementById("preview").src = e.target.result;
+      document.getElementById("preview").style.display = "block";
+    };
 
-      reader.readAsDataURL(this.files[0]);
+    reader.readAsDataURL(this.files[0]);
   };
 </script>
+
+

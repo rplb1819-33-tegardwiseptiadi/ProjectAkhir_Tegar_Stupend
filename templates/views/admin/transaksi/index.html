@@ -94,3 +94,27 @@
 <!-- End #main --> 
 <!-- footer -->
 {% include '/admin/dashboard/footer.html' %}
+
+
+
+<script>
+  function confirmDelete(namaKeluhan) {
+    return confirm('Apakah anda yakin ingin menghapus Keluhan ' + namaKeluhan + '?');
+  }
+
+  // SweetAlert for flash messages
+  document.addEventListener('DOMContentLoaded', function() {
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          Swal.fire({
+            title: "{{ 'Error' if category == 'error' else 'Success' }}",
+            text: "{{ message }}",
+            icon: "{{ 'error' if category == 'error' else 'success' }}",
+            confirmButtonText: 'OK'
+          });
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+  });
+</script>
