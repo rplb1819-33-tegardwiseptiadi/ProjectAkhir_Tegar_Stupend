@@ -3,8 +3,11 @@
 <head>
     <title>LOGIN ACCOUNT</title>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="icon" type="image/png" href="{{ url_for('static', filename='assets_penghuni/assets_login/images/favicon.png') }}"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"> 
+
+    <!-- ICON WEB SERVER -->
+    <link href="{{ url_for('static', filename='icon_logo/side_nav.png') }}" rel="icon"> 
+
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='assets_penghuni/assets_login/vendor/bootstrap/css/bootstrap.min.css') }}">
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='assets_penghuni/assets_login/fonts/font-awesome-4.7.0/css/font-awesome.min.css') }}">
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='assets_penghuni/assets_login/fonts/iconic/css/material-design-iconic-font.min.css') }}">
@@ -18,14 +21,36 @@
 
     <!-- SweetAlert CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+
+    <style>
+        .container-login100 {
+            position: relative; 
+            color: white;
+        }
+
+        .login100-form-title {
+            font-size: 32px;
+            font-weight: bold;
+            margin-top: 30px; /* Adjust as needed */
+            display: flex;
+            justify-content: center; /* Centers horizontally */
+            align-items: center; /* Centers vertically */
+            height: 200px; /* Adjust based on your design */
+        }
+
+        .login100-form-title img {
+            max-width: 100%; /* Ensures image does not exceed parent width */
+            max-height: 100%; /* Ensures image does not exceed parent height */
+        }
+    </style>
 </head>
 <body>
     <div class="limiter">
-        <div class="container-login100" style="background-image: url('{{ url_for('static', filename='assets_penghuni/assets_login/images/bg-01.jpg') }}');">
+        <div class="container-login100" style="background-image: url('{{ url_for('static', filename='assets_penghuni/assets_login/images/bg-01.jpg') }}'); ">
             <div class="wrap-login100 p-l-55 p-r-55 p-t-65 p-b-54">
                 <form class="login100-form validate-form" method="POST" action="{{ url_for('login') }}">
                     <span class="login100-form-title p-b-49">
-                        Login
+                        <img src="{{ url_for('static', filename='icon_logo/side_nav.png') }}" alt="" class="img-fluid">
                     </span>
 
                     <div class="wrap-input100 validate-input m-b-23" data-validate="Email is required">

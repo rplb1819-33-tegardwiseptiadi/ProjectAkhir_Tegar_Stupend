@@ -25,21 +25,21 @@
       <div class="col-lg-12">
         <div class="card">
           <div class="card-body">
-            <h5 class="card-title">EDIT DATA KONTRAKAN</h5>
+            <h5 class="card-title" style="text-align: center;">EDIT DATA KONTRAKAN</h5>
 
             <!-- Multi Columns Form -->
             <form class="row g-3" id="form-editKontrakan" action="{{ url_for('views.edit_kontrakan', kontrakan_id=data['_id']) }}" method="post" enctype="multipart/form-data">
-              <div class="col-md-12">
+              <div class="col-md-6">
                 <label for="inputName5" class="form-label">Nama Kontrakan</label>
                 <input type="text" class="form-control" id="inputName5" placeholder="Masukkan Nama Kontrakan" name="nama_kontrakan" value="{{ data.nama_kontrakan }}" />
                 <div id="nama-alert" class="alert alert-danger mt-2" style="display: none">Nama kontrakan harus diisi.</div>
               </div>
-              <div class="col-md-12">
+              <div class="col-md-6">
                 <label for="harga" class="form-label">Harga Kontrakan</label>
                 <input type="number" class="form-control" id="harga" placeholder="Masukkan Harga Kontrakan" name="harga" value="{{ data.harga }}" />
                 <div id="harga-alert" class="alert alert-danger mt-2" style="display: none">Harga kontrakan harus diisi dan harus angka.</div>
               </div>
-              <div class="col-md-12">
+              <div class="col-md-6">
                 <label for="kapasitas" class="form-label">Kapasitas Kontrakan</label>
                 <input type="number" class="form-control" id="kapasitas" placeholder="Masukkan Kapasitas Kontrakan" name="kapasitas" value="{{ data.kapasitas }}" />
                 <div id="kapasitas-alert" class="alert alert-danger mt-2" style="display: none">Kapasitas kontrakan harus diisi dan harus angka.</div>
@@ -47,19 +47,19 @@
               <div class="col-md-3">
                 <label>Status</label><br />
                 <div class="form-check">
-                  <input class="form-check-input" type="radio" id="gridRadios1" name="status" value="kosong" {% if data.status == 'kosong' %}checked{% endif %}>
+                  <input class="form-check-input" type="radio" id="gridRadios1" name="status" value="Kosong" {% if data.status == 'Kosong' %}checked{% endif %}>
                   <label class="form-check-label" for="gridRadios1">Kosong</label>
                 </div>
                 <div class="form-check">
-                  <input class="form-check-input" type="radio" id="gridRadios2" name="status" value="booking" {% if data.status == 'booking' %}checked{% endif %}>
+                  <input class="form-check-input" type="radio" id="gridRadios2" name="status" value="Booking" {% if data.status == 'Booking' %}checked{% endif %}>
                   <label class="form-check-label" for="gridRadios2">Booking</label>
                 </div>
                 <div class="form-check">
-                  <input class="form-check-input" type="radio" id="gridRadios3" name="status" value="penuh" {% if data.status == 'penuh' %}checked{% endif %}>
+                  <input class="form-check-input" type="radio" id="gridRadios3" name="status" value="Penuh" {% if data.status == 'Penuh' %}checked{% endif %}>
                   <label class="form-check-label" for="gridRadios3">Penuh</label>
                 </div>
                 <div class="form-check">
-                  <input class="form-check-input" type="radio" id="gridRadios4" name="status" value="diperbaiki" {% if data.status == 'diperbaiki' %}checked{% endif %}>
+                  <input class="form-check-input" type="radio" id="gridRadios4" name="status" value="Diperbaiki" {% if data.status == 'Diperbaiki' %}checked{% endif %}>
                   <label class="form-check-label" for="gridRadios4">Diperbaiki</label>
                 </div>
               </div>
@@ -81,7 +81,7 @@
               </div>
               <div class="col-md-8">
                 <label for="inputImage" class="form-label">Foto Kontrakan</label>
-                <img id="image-preview" src="{{ url_for('static', filename='upload/kontrakan/' + data.gambar.split('/')[-1]) }}" alt="Preview" style="max-width: 200px; margin-top: 10px" />
+                <img id="image-preview" class="form-control" src="{{ url_for('static', filename='upload/kontrakan/' + data.gambar.split('/')[-1]) }}" alt="Preview" style="max-width: 200px; margin-top: 10px" />
                 <input type="file" class="form-control" id="inputImage" name="image" />
                 <div id="image-alert" class="alert alert-danger mt-2" style="display: none">Pilih gambar kontrakan.</div>
               </div>

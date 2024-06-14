@@ -7,6 +7,9 @@
 
 
 <main id="main" class="main">
+  <section class="section">
+    <div class="row justify-content-center">
+
   <div class="pagetitle">
     <h1>Edit Transaksi</h1>
     <nav>
@@ -22,15 +25,14 @@
   <div id="error-alert" class="alert alert-danger mt-2" style="display: none"></div>
 
   <!-- End Page Title -->
-  <section class="section">
-    <div class="row justify-content-center">
+
       <div class="col-lg-10">
         <div class="card">
           <div class="card-body">
             <h5 class="card-title" style="text-align: center">EDIT DATA TRANSAKSI</h5>
 
             <!-- Multi Columns Form -->
-            <form id="form-transaksi" class="row g-3" method="POST" action="{{ url_for('views.edit_transaksi', transaksi_id=transaksi._id) }}" enctype="multipart/form-data">
+            <form id="form-transaksi" class="row g-3 justify-content-center" method="POST" action="{{ url_for('views.edit_transaksi', transaksi_id=transaksi._id) }}" enctype="multipart/form-data">
             
              <!-- Nama Penghuni --> 
             <div class="col-md-10">
@@ -99,7 +101,7 @@
               </div>
 
               <!-- Status Bayar -->
-              <div class="col-md-5">
+              <div class="col-md-10">
                 <label for="inputStatus" class="form-label">Status</label>
                 <div class="form-check">
                   <input class="form-check-input" type="radio" name="status" id="status1" value="Sudah Divalidasi" {% if transaksi.status == 'Sudah Divalidasi' %}checked{% endif %} />

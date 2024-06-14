@@ -24,14 +24,12 @@
       <div class="col-lg-5">
         <div class="row">
           <!-- Kontrakan Card -->
-          <div class="col-md-12 mb-12">
+          <div class="col-md-12 mb-3">
             <div class="card info-card sales-card">
               <div class="card-body">
                 <h5 class="card-title">Total <span>| Kontrakan</span></h5>
                 <div class="d-flex align-items-center">
-                  <div
-                    class="card-icon rounded-circle d-flex align-items-center justify-content-center"
-                  >
+                  <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
                     <i class="bi bi-cart"></i>
                   </div>
                   <div class="ps-3">
@@ -44,14 +42,12 @@
           <!-- End Kontrakan Card -->
 
           <!-- Keluhan Card -->
-          <div class="col-md-12 mb-12">
+          <div class="col-md-12 mb-3">
             <div class="card info-card customers-card">
               <div class="card-body">
                 <h5 class="card-title">Total <span>| Keluhan</span></h5>
                 <div class="d-flex align-items-center">
-                  <div
-                    class="card-icon rounded-circle d-flex align-items-center justify-content-center"
-                  >
+                  <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
                     <i class="bi bi-people"></i>
                   </div>
                   <div class="ps-3">
@@ -64,14 +60,12 @@
           <!-- End Keluhan Card -->
 
           <!-- Transaksi Card -->
-          <div class="col-md-12 mb-12">
+          <div class="col-md-12 mb-3">
             <div class="card info-card revenue-card">
               <div class="card-body">
                 <h5 class="card-title">Total <span>| Transaksi</span></h5>
                 <div class="d-flex align-items-center">
-                  <div
-                    class="card-icon rounded-circle d-flex align-items-center justify-content-center"
-                  >
+                  <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
                     <i class="bi bi-currency-dollar"></i>
                   </div>
                   <div class="ps-3">
@@ -82,28 +76,9 @@
             </div>
           </div>
           <!-- End Transaksi Card -->
-
-          <!-- Penghuni Card -->
-          <div class="col-md-12 mb-12">
-            <div class="card info-card customers-card">
-              <div class="card-body">
-                <h5 class="card-title">Total <span>| Penghuni</span></h5>
-                <div class="d-flex align-items-center">
-                  <div
-                    class="card-icon rounded-circle d-flex align-items-center justify-content-center"
-                  >
-                    <i class="bi bi-people"></i>
-                  </div>
-                  <div class="ps-3">
-                    <h6>{{ penghuni_count }} Penghuni</h6>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-          <!-- End Penghuni Card -->
         </div>
       </div>
+      <!-- End Left side columns -->
 
       <!-- Right side columns -->
       <div class="col-lg-7">
@@ -111,7 +86,7 @@
           <div class="card-body">
             <h5 class="card-title">Riwayat Keluhan Penghuni</h5>
 
-            <table id="example" class="table table-borderless datatable">
+            <table id="example" class="table table-bordered table-striped table-hover">
               <thead>
                 <tr>
                   <th scope="col">No</th>
@@ -126,35 +101,30 @@
               <tbody>
                 {% for keluhan in data_keluhan %}
                 <tr>
-                    <td scope="row">{{ loop.index }}</td>
-                    <td>
-                      <img
-                      src="{{ url_for('static', filename=keluhan.gambar_keluhan.split('static/')[-1].replace('\\', '/')) }}"
-                      alt="Gambar Transaksi"
-                      class="img-fluid"
-                      style="max-width: 150px; max-height: 150px"
-                      />
+                  <td>{{ loop.index }}</td>
+                  <td>
+                    <img src="{{ url_for('static', filename=keluhan.gambar_keluhan.split('static/')[-1].replace('\\', '/')) }}" alt="Gambar Keluhan" class="img-fluid" style="max-width: 150px; max-height: 150px;">
                   </td>
-                    <td>{{ keluhan.nama_penghuni }}</td>
-                    <td>{{ keluhan.nama_kontrakan }}</td>
-                    <td>{{ keluhan.tgl_keluhan }}</td>
-                    <td>{{ keluhan.keluhan_penghuni }}</td>
-                    <td>
-                        {% if keluhan.status == "Sudah Divalidasi" %}
-                        <button class="btn btn-success">Sudah Divalidasi</button>
-                        {% elif keluhan.status == "Belum Divalidasi" %}
-                        <button class="btn btn-danger">Belum Divalidasi</button>
-                        {% endif %}
-                    </td> 
+                  <td>{{ keluhan.nama_penghuni }}</td>
+                  <td>{{ keluhan.nama_kontrakan }}</td>
+                  <td>{{ keluhan.tgl_keluhan }}</td>
+                  <td>
+                    {% if keluhan.status == "Sudah Divalidasi" %}
+                    <button class="btn btn-success">Sudah Divalidasi</button>
+                    {% elif keluhan.status == "Belum Divalidasi" %}
+                    <button class="btn btn-danger">Belum Divalidasi</button>
+                    {% endif %}
+                  </td>
+                  <td>{{ keluhan.keluhan_penghuni }}</td>
                 </tr>
                 {% endfor %}
-            </tbody>
+              </tbody>
             </table>
           </div>
         </div>
       </div>
       <!-- End Right side columns -->
-     
+    </div>
   </section>
   <!-- end section dashboard -->
 </main>
@@ -162,4 +132,3 @@
 
 <!-- footer -->
 {% include '/penyewa/dashboard/footer.html' %}
- 

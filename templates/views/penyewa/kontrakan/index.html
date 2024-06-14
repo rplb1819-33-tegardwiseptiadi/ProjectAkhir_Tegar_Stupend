@@ -6,15 +6,15 @@
 
 <!-- Start Main -->
 <main id="main">
-    <section id="transaksi" class="container">
+    <section id="kontrakan" class="container">
         <div class="row">
             
             <div class="pagetitle">
-                <h1>Dashboard</h1>
+                <h1>Kontrakan</h1>
                 <nav>
                     <ol class="breadcrumb">
                         <li class="breadcrumb-item"><a href="{{ url_for('views.homepage') }}">Dashboard</a></li> 
-                        <li class="breadcrumb-item active">Keluhan</li>
+                        <li class="breadcrumb-item active">Kontrakan</li>
                     </ol>
                 </nav>
             </div><!-- End Page Title --> 
@@ -25,39 +25,36 @@
           
                     <!-- Recent Sales --> 
                     <div class="card recent-sales overflow-auto"> 
-                        <h5 class="card-title">Data <span>| Keluhan</span></h5>
-                        <div class="btn_tambah mb3">
-                            <a href="{{ url_for('views.tambah_keluhan_penyewa') }}" class="btn btn-success">Tambah Data</a>
-                        </div>
-                        
+                        <h5 class="card-title">Data <span>| Kontrakan</span></h5>  
                         <table id="example" class="table table-borderless datatable"> 
                             <thead>
                                 <tr>
-                                  <th scope="col">No</th>
-                                  <th scope="col">Gambar</th>
-                                  <th scope="col">Nama</th>
-                                  <th scope="col">Kapasitas</th>
-                                  <th scope="col">Tipe</th>
-                                  <th scope="col">Status</th> 
+                                  <th style="text-align: center;" scope="col">No</th>
+                                  <th style="text-align: center;" scope="col">Gambar</th>
+                                  <th style="text-align: center;" scope="col">Nama</th>
+                                  <th style="text-align: center;" scope="col">Kapasitas</th>
+                                  <th style="text-align: center;" scope="col">Tipe</th>
+                                  <th style="text-align: center;" scope="col">Status</th> 
+                                  <th style="text-align: center;" scope="col">Aksi</th> 
                                 </tr>
                               </thead>
                               <tbody>
                                 {% for item in kontrakan %}
                                 <tr>
-                                  <td scope="row">{{ loop.index }}</td>
-                                  <td>
+                                  <td style="text-align: center;" scope="row">{{ loop.index }}</td>
+                                  <td style="text-align: center;">
                                     <img
                                       src="{{ url_for('static', filename='upload/kontrakan/' + item.gambar.split('/')[-1].split('\\')[-1]) }}"
                                       alt="Foto KTP"
                                       class="img-fluid"
-                                      style="max-width: 200px"
+                                      style="max-width: 150px; max-height: 150px;"
                                     />
                                   </td>
-                                  <td>{{item.nama_kontrakan}}</td>
-                                  <td>{{item.kapasitas}} Orang</td>
-                                  <td>{{item.tipeKontrakan}}</td>
-                                  <td>
-                                    {% if item.status == 'kosong' %}
+                                  <td style="text-align: center;">{{item.nama_kontrakan}}</td>
+                                  <td style="text-align: center;">{{item.kapasitas}} Orang</td>
+                                  <td style="text-align: center;">{{item.tipeKontrakan}}</td>
+                                  <td style="text-align: center;">
+                                    {% if item.status == 'Kosong' %}
                                         <button class="btn btn-success">{{ item.status }}</button>
                                     {% elif item.status == 'Booking' %}
                                         <button class="btn btn-warning">{{ item.status }}</button>
@@ -69,6 +66,11 @@
                                         <button class="btn btn-secondary">{{ item.status }}</button> <!-- Default case if needed -->
                                     {% endif %}
                                 </td>
+                                <td style="text-align: center;">
+                                    <a href="{{ url_for('views.penyewa_detail_kontrakan', kontrakan_id=item._id) }}" class="btn btn-warning">
+                                        <i class="fas fa-eye"></i> Detail
+                                    </a>
+                                </td>
                                 </tr>
                                 {% endfor %}
                               </tbody>
@@ -76,7 +78,7 @@
                     </div>
                 </div><!-- End Recent Sales -->
             </div><!-- End Left side columns -->
-           
+            
         </div>
     </section>
     <!-- end section dashboard -->

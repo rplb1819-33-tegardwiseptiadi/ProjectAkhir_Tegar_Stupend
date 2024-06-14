@@ -2,17 +2,17 @@
   <header id="header" class="fixed-top ">
     <div class="container d-flex align-items-center">
 
-      <h1 class="logo me-auto"><a href="{{ url_for('views.homepage') }}">KUYRAPC</a></h1>
-      <!-- Uncomment below if you prefer to use an image logo -->
-      <!-- <a href="index.html" class="logo me-auto"><imgassets/assets_homepage_customer/img/logo.png" alt="" class="img-fluid"></a>-->
-
+      <div class="d-flex align-items-center flex-grow-1">
+        <a href="{{ url_for('views.homepage') }}" class="logo me-3"><img src="{{ url_for('static', filename='icon_logo/side_nav.png') }}" alt="" class="img-fluid"></a>
+        <h1 class="logo me-3"><a href="{{ url_for('views.homepage') }}">KONSU</a></h1>
+    </div>
       <nav id="navbar" class="navbar">
         <ul>
           <li><a class="nav-link scrollto active" href="#hero">Home</a></li>
           <li><a class="nav-link scrollto" href="#product">Properties</a></li> 
           <li><a class="nav-link scrollto" href="#staff">Owner</a></li> 
           <li><a class="nav-link scrollto" href="#about">About</a></li> 
-          <li><a class="nav-link scrollto" href="#why">Why KUYRAPC</a></li>
+          <li><a class="nav-link scrollto" href="#why">Why KONSU</a></li>
           <li><a class="nav-link scrollto" href="#contact">Contact</a></li>
           <li><a class="getstarted scrollto" href="{{ url_for('login') }}">Have An Account ?</a></li> 
         </ul>

@@ -6,11 +6,11 @@
 
 <!-- Start Main -->
 <main id="main">
-    <section id="transaksi" class="container">
+    <section id="keluhan" class="container">
         <div class="row">
             
             <div class="pagetitle">
-                <h1>Dashboard</h1>
+                <h1>Keluhan</h1>
                 <nav>
                     <ol class="breadcrumb">
                         <li class="breadcrumb-item"><a href="{{ url_for('views.homepage') }}">Dashboard</a></li> 
@@ -44,8 +44,8 @@
                             <tbody>
                                 {% for keluhan in data_keluhan %}
                                 <tr>
-                                    <td scope="row">{{ loop.index }}</td>
-                                    <td>
+                                    <td style="text-align: center;" scope="row">{{ loop.index }}</td>
+                                    <td style="text-align: center;">
                                         <img
                                             src="{{ url_for('static', filename=keluhan.gambar_keluhan.split('static/')[-1].replace('\\', '/')) }}"
                                             alt="Gambar keluhan"
@@ -53,9 +53,9 @@
                                             style="max-width: 100px; max-height: 100px"
                                         />
                                     </td>
-                                    <td>{{ keluhan.nama_penghuni }}</td>
-                                    <td>{{ keluhan.nama_kontrakan }}</td>
-                                    <td>
+                                    <td style="text-align: center;">{{ keluhan.nama_penghuni }}</td>
+                                    <td style="text-align: center;">{{ keluhan.nama_kontrakan }}</td>
+                                    <td style="text-align: center;">
                                         {% if keluhan.status == "Sudah Divalidasi" %}
                                         <button class="btn btn-success">Sudah Divalidasi</button>
                                         {% elif keluhan.status == "Belum Divalidasi" %}

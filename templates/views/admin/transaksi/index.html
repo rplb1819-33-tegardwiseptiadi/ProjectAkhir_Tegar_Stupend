@@ -45,6 +45,7 @@
                       <th scope="col">Gambar</th>
                       <th scope="col">Nama</th>
                       <th scope="col">Kontrakan</th>
+                      <th scope="col">Total Harga</th>
                       <th scope="col">Status</th>
                       <th scope="col">Aksi</th>
                     </tr>
@@ -63,6 +64,7 @@
                         </td>
                         <td>{{ transaksi.nama_penghuni }}</td>
                         <td>{{ transaksi.nama_kontrakan }}</td>
+                        <td>{{ transaksi.total_harga }}</td>
                         <td>
                             {% if transaksi.status == "Sudah Divalidasi" %}
                             <button class="btn btn-success">Sudah Divalidasi</button>

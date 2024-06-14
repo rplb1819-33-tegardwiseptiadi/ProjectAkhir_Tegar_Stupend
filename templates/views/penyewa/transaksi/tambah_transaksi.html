@@ -5,7 +5,10 @@
 {% include '/penyewa/dashboard/navbar_homepage.html' %}
 
 <main id="main" class="main">
-  <div class="pagetitle">
+  <section id="transaksi" class="container">
+    <div class="row justify-content-center">
+  
+    <div class="pagetitle">
     <h1>Tambah Transaksi</h1>
     <nav>
       <ol class="breadcrumb">
@@ -28,8 +31,6 @@
   ></div>
 
   <!-- End Page Title -->
-  <section class="section">
-    <div class="row justify-content-center">
       <div class="col-lg-10">
         <div class="card">
           <div class="card-body">
@@ -87,7 +88,7 @@
                 >
                   <option selected value="">Pilih Kontrakan...</option>
                   {% for k in kontrakan %}
-                    {% if k.status == 'kosong'%}
+                    {% if k.status == 'Kosong'%}
                       <option value="{{ k._id }}" data-harga="{{ k.harga }}">
                         {{ k.nama_kontrakan }}
                       </option>

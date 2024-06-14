@@ -27,12 +27,11 @@ logging.basicConfig(level=logging.DEBUG)
 # Blueprint for views
 views_bp = Blueprint('views', __name__, template_folder='Templates/views')
  
- 
+# mengatur locale ke 'id_ID' untuk format Rupiah
+locale.setlocale(locale.LC_ALL, 'id_ID.UTF-8')
 
 app = Flask(__name__) 
-
-app.secret_key = secrets.token_hex(16)
-app.config["TEMPLATES_AUTO_RELOAD"] = True
+ 
 
 # Flask-Session configuration
 app.config['SESSION_TYPE'] = 'filesystem'
@@ -326,7 +325,6 @@ def homepage_admin():
  
 
 #  ------------------------ START UPDATE AKUN ADMIN ------------------------ 
-
 @views_bp.route('/admin/setting_akun/<user_id>', methods=['GET', 'POST'])
 @login_required
 @role_required('admin')
@@ -356,8 +354,8 @@ def update_account_admin(user_id):
             pw_hash = generate_password_hash(password)
             update_data['password'] = pw_hash
 
-        # Update data di collection admin
-        admin_result = db.admin.update_one({'_id': ObjectId(user_id)}, {"$set": update_data})
+        # Update data di collection penghuni
+        admin_result = db.penghuni.update_one({'_id': ObjectId(user_id)}, {"$set": update_data})
         print(f'Debug: admin_result = {admin_result.matched_count} matched, {admin_result.modified_count} modified')
 
         if admin_result.matched_count == 0:
@@ -365,8 +363,7 @@ def update_account_admin(user_id):
             return redirect(url_for('homepage_admin'))
 
         flash('Akun admin berhasil diperbarui', 'success')
-        return redirect(url_for('views.update_account_admin', user_id=user_id))
-
+        return redirect(url_for('homepage_admin'))
 
 
 #  ------------------------ END UPDATE AKUN ADMIN ------------------------ 
@@ -720,14 +717,6 @@ def transaksi():
     pipeline = [
         {
             '$lookup': {
-                'from': 'users',
-                'localField': 'penghuni_id',
-                'foreignField': '_id',
-                'as': 'user_data'
-            }
-        },
-        {
-            '$lookup': {
                 'from': 'penghuni',
                 'localField': 'penghuni_id',
                 'foreignField': '_id',
@@ -735,14 +724,7 @@ def transaksi():
             }
         },
         {
-            '$addFields': {
-                'nama_penghuni': {
-                    '$ifNull': [
-                        { '$arrayElemAt': ['$user_data.nama', 0] },
-                        { '$arrayElemAt': ['$penghuni_data.nama', 0] }
-                    ]
-                }
-            }
+            '$unwind': '$penghuni_data'
         },
         {
             '$lookup': {
@@ -760,20 +742,27 @@ def transaksi():
                 '_id': 1,
                 'bukti_pembayaran': 1,
                 'status': 1,
-                'nama_penghuni': 1, 
-                'nama_kontrakan': '$kontrakan.nama_kontrakan'
+                'nama_penghuni': '$penghuni_data.nama', 
+                'nama_kontrakan': '$kontrakan.nama_kontrakan',
+                'total_harga': 1
             }
         }
     ]
 
     data_transaksi = list(db.transaksi.aggregate(pipeline))
 
+    # Format total_harga to Rupiah
+    for transaksi in data_transaksi:
+        if 'total_harga' in transaksi:
+            transaksi['total_harga'] = locale.currency(transaksi['total_harga'], grouping=True)
+        else:
+            transaksi['total_harga'] = locale.currency(0, grouping=True)
+
     # Print results for debugging
     for transaksi in data_transaksi:
         print(transaksi)
 
-    return render_template('views/admin/transaksi/index.html', data_transaksi=data_transaksi)
-
+    return render_template('views/admin/transaksi/index.html', data_transaksi=data_transaksi) 
 
 # Route for tambah_transaksi page
 @views_bp.route('/admin/transaksi/tambah_transaksi', methods=['GET', 'POST'])
@@ -897,10 +886,17 @@ def detail_transaksi(transaksi_id):
         ]
 
         transaksi = next(db.transaksi.aggregate(pipeline))
+        
+        # Format values to Rupiah
+        transaksi['harga_perbulan'] = locale.currency(transaksi.get('harga_perbulan', 0), grouping=True)
+        transaksi['total_harga'] = locale.currency(transaksi.get('total_harga', 0), grouping=True)
+        transaksi['uang_bayar'] = locale.currency(transaksi.get('uang_bayar', 0), grouping=True)
+        transaksi['kembalian'] = locale.currency(transaksi.get('kembalian', 0), grouping=True)
+
     except StopIteration:
         abort(404, description="Transaction not found")
+    
     return render_template('views/admin/transaksi/detail_transaksi.html', transaksi=transaksi)
-
 
 # Route edit transaksi role admin
 @views_bp.route('/admin/transaksi/edit_transaksi/<transaksi_id>', methods=['GET', 'POST'])
@@ -1341,13 +1337,20 @@ def hapus_keluhan(keluhan_id):
 @login_required
 @role_required('penghuni')
 def homepage():
-    # Ambil seluruh data penghuni dari MongoDB
-    penghuni_count = db.penghuni.count_documents({})
+    # Ambil seluruh data penghuni dari MongoDB 
     kontrakan_count = db.kontrakan.count_documents({})
     keluhan_count = db.keluhan.count_documents({})
- 
-    # Mengambil total transaksi
+
+    # Mendapatkan user_id dari pengguna yang sedang login
+    user_id = g.current_user['_id']
+
+    # Mengambil total transaksi hanya untuk akun yang login
     transaksi_total = db.transaksi.aggregate([
+        {
+            "$match": {
+                "penghuni_id": user_id
+            }
+        },
         {
             "$group": {
                 "_id": None,
@@ -1356,7 +1359,6 @@ def homepage():
         }
     ])
     transaksi_total = next(transaksi_total, {'total': 0})['total']
- 
 
     # Set locale sesuai dengan pengaturan lokal Anda
     locale.setlocale(locale.LC_ALL, 'id_ID')
@@ -1366,29 +1368,16 @@ def homepage():
 
     pipeline = [
         {
+            '$match': {
+                'penghuni_id': user_id
+            }
+        },
+        {
             '$lookup': {
                 'from': 'users',
                 'localField': 'penghuni_id',
                 'foreignField': '_id',
                 'as': 'user_data'
-            }
-        },
-        {
-            '$lookup': {
-                'from': 'penghuni',
-                'localField': 'penghuni_id',
-                'foreignField': '_id',
-                'as': 'penghuni_data'
-            }
-        },
-        {
-            '$addFields': {
-                'nama_penghuni': {
-                    '$ifNull': [
-                        { '$arrayElemAt': ['$user_data.nama', 0] },
-                        { '$arrayElemAt': ['$penghuni_data.nama', 0] }
-                    ]
-                }
             }
         },
         {
@@ -1418,12 +1407,11 @@ def homepage():
     keluhan_list = list(db.keluhan.aggregate(pipeline))
 
     return render_template('views/penyewa/index.html', 
-                           data_keluhan=keluhan_list,
-                           penghuni_count=penghuni_count,
+                           data_keluhan=keluhan_list, 
                            kontrakan_count=kontrakan_count,
                            keluhan_count=keluhan_count,
-                           transaksi_total=transaksi_total_str, 
-                           )
+                           transaksi_total=transaksi_total_str)
+ 
 #  ------------------------ END HOMEPAGE PENGHUNI ------------------------ 
 
 
@@ -1482,6 +1470,21 @@ def penyewa_kontrakan():
     # Read - Menampilkan daftar kontrakan
     kontrakan = list(db.kontrakan.find({}))
     return render_template('views/penyewa/kontrakan/index.html', kontrakan=kontrakan)
+
+
+# routes detail kontrakan 
+@views_bp.route('/penyewa/kontrakan/detail_kontrakan/<kontrakan_id>', methods=['GET', 'POST'])
+@login_required
+@role_required('penghuni')
+def penyewa_detail_kontrakan(kontrakan_id):
+    if request.method == 'POST':
+        # Handle POST request if needed
+        pass
+    # Read - Menampilkan detail kontrakan
+    data = db.kontrakan.find_one({'_id': ObjectId(kontrakan_id)})
+    if not data:
+        return "Kontrakan tidak ditemukan", 404
+    return render_template('views/penyewa/kontrakan/detail_kontrakan.html', data=data)
 
 # ------------------------ END KONTRAKAN ------------------------
 
@@ -1722,7 +1725,7 @@ def hapus_keluhan_penyewa(keluhan_id):
 # ------------------------ END KELUHAN ------------------------
  
 # ------------------------ START TRANSAKSI  ------------------------
-# Tambah transaksi role penghuni
+# Route for index_transaksi page
 @views_bp.route('/penyewa/transaksi')
 @login_required
 @role_required('penghuni')
@@ -1734,15 +1737,7 @@ def penyewa_transaksi():
                 '$match': {
                     'penghuni_id': penghuni_id
                 }
-            },
-            {
-                '$lookup': {
-                    'from': 'users',
-                    'localField': 'penghuni_id',
-                    'foreignField': '_id',
-                    'as': 'user_data'
-                }
-            },
+            }, 
             {
                 '$lookup': {
                     'from': 'penghuni',
@@ -1752,15 +1747,7 @@ def penyewa_transaksi():
                 }
             },
             {
-                '$addFields': {
-                    'penghuni': {
-                        '$cond': {
-                            'if': { '$gt': [{ '$size': '$user_data' }, 0] },
-                            'then': { '$arrayElemAt': ['$user_data', 0] },
-                            'else': { '$arrayElemAt': ['$penghuni_data', 0] }
-                        }
-                    }
-                }
+                '$unwind': '$penghuni_data'
             },
             {
                 '$lookup': {
@@ -1778,17 +1765,24 @@ def penyewa_transaksi():
                     '_id': 1,
                     'bukti_pembayaran': 1,
                     'status': 1,
-                    'nama_penghuni': '$penghuni.nama',
+                    'total_harga': 1,
+                    'nama_penghuni': '$penghuni_data.nama',
                     'nama_kontrakan': '$kontrakan.nama_kontrakan'
                 }
             }
         ])
 
     data_transaksi = list(data_transaksi)
+    
+    # Format total_harga ke dalam format Rupiah
+    for transaksi in data_transaksi:
+        transaksi['total_harga'] = locale.currency(transaksi.get('total_harga', 0), grouping=True)
+
     print(data_transaksi)  # Debug print
     if not data_transaksi:
         logging.debug("No transactions found.")
     return render_template('views/penyewa/transaksi/index.html', list_transaksi=data_transaksi)
+
 
 
 # Route for tambah_transaksi page
@@ -1960,14 +1954,6 @@ def detail_transaksi_penyewa(transaksi_id):
             },
             {
                 '$lookup': {
-                    'from': 'users',
-                    'localField': 'penghuni_id',
-                    'foreignField': '_id',
-                    'as': 'user_data'
-                }
-            },
-            {
-                '$lookup': {
                     'from': 'penghuni',
                     'localField': 'penghuni_id',
                     'foreignField': '_id',
@@ -1975,14 +1961,7 @@ def detail_transaksi_penyewa(transaksi_id):
                 }
             },
             {
-                '$addFields': {
-                    'nama_penghuni': {
-                        '$ifNull': [
-                            { '$arrayElemAt': ['$user_data.nama', 0] },
-                            { '$arrayElemAt': ['$penghuni_data.nama', 0] }
-                        ]
-                    }
-                }
+                '$unwind': '$penghuni_data'
             },
             {
                 '$lookup': {
@@ -2000,7 +1979,7 @@ def detail_transaksi_penyewa(transaksi_id):
                     '_id': 1,
                     'bukti_pembayaran': 1,
                     'status': 1,
-                    'nama_penghuni': 1, 
+                    'nama_penghuni': '$penghuni_data.nama', 
                     'nama_kontrakan': '$kontrakan.nama_kontrakan',
                     'tgl_pembayaran': 1,
                     'harga_perbulan': 1,
@@ -2013,11 +1992,17 @@ def detail_transaksi_penyewa(transaksi_id):
         ]
 
         transaksi = next(db.transaksi.aggregate(pipeline))
+
+        # Format fields to Rupiah
+        transaksi['harga_perbulan'] = locale.currency(transaksi.get('harga_perbulan', 0), grouping=True)
+        transaksi['total_harga'] = locale.currency(transaksi.get('total_harga', 0), grouping=True)
+        transaksi['uang_bayar'] = locale.currency(transaksi.get('uang_bayar', 0), grouping=True)
+        transaksi['kembalian'] = locale.currency(transaksi.get('kembalian', 0), grouping=True)
+
     except StopIteration:
         abort(404, description="Transaction not found")
 
     return render_template('views/penyewa/transaksi/detail_transaksi.html', transaksi=transaksi)
-
 
 # ------------------------ END TRANSAKSI ------------------------
 
