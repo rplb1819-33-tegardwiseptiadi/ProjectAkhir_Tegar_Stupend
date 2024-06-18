@@ -259,7 +259,7 @@
     }
 
     // Jumlah Sewa
-    if (jumlahSewa === "" || isNaN(jumlahSewa)) {
+    if (jumlahSewa === "" || isNaN(jumlahSewa) || parseInt(jumlahSewa) <= 0) {
       document.getElementById("jumlah_sewa-alert").style.display = "block";
       isValid = false;
     } else {

@@ -26,7 +26,7 @@
                     <!-- Recent Sales --> 
                     <div class="card recent-sales overflow-auto"> 
                         <h5 class="card-title">Data <span>| Kontrakan</span></h5>  
-                        <table id="example" class="table table-borderless datatable"> 
+                        <table id="example" class="table table-bordered table-striped table-hover">
                             <thead>
                                 <tr>
                                   <th style="text-align: center;" scope="col">No</th>
@@ -40,7 +40,7 @@
                               </thead>
                               <tbody>
                                 {% for item in kontrakan %}
-                                <tr>
+                                <tr style="vertical-align: middle;">
                                   <td style="text-align: center;" scope="row">{{ loop.index }}</td>
                                   <td style="text-align: center;">
                                     <img

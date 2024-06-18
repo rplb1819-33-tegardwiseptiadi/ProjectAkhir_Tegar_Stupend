@@ -109,21 +109,31 @@ def login_required(f):
         return f(*args, **kwargs)
     return decorated_function
 
+# kode untuk hak akses pengguna
+# dan penanganan akses halaman
 def role_required(role):
     def wrapper(f):
         @wraps(f)
         def wrapped_function(*args, **kwargs):
             user_id = session.get('user_id')
             if not user_id:
-                return "Access denied: No user id in session", 403
-            
+                return redirect(url_for('login'))
+
             user = penghuni_collection.find_one({'_id': ObjectId(user_id)})
             if not user:
-                return "Access denied: User not found", 403
-            
+                return redirect(url_for('login'))
+
             if user.get('role') != role:
-                return "Access denied: Incorrect role", 403
-            
+                # Jika peran pengguna tidak sesuai, tampilkan SweetAlert tanpa menghapus sesi
+                print(f"Incorrect role: expected {role}, got {user.get('role')}")
+                return render_template(
+                    'error/error.html',
+                    icon='error',
+                    title='Access Denied',
+                    message='You do not have permission to access this page. You have been logged out.',
+                    redirect_url=url_for('logout')  # Mengarahkan ke halaman logout setelah SweetAlert
+                ), 403
+
             return f(*args, **kwargs)
         return wrapped_function
     return wrapper
@@ -151,6 +161,10 @@ def load_current_user():
 def inject_user():
     return dict(current_user=g.current_user)
 
+@app.route('/clear_session_user_name', methods=['POST'])
+def clear_session_user_name():
+    session.pop('user_name', None)
+    return '', 204
 
 
 # Routes login
@@ -177,12 +191,13 @@ def login():
                 response = jsonify({"result": "success"})
                 response.set_cookie(TOKEN_KEY, token)
                 session['user_id'] = str(user['_id'])  # Store user id in session
+                session['user_name'] = user.get('name')  # Store user name in session
                 logging.debug(f"Session set for user ID: {session['user_id']}")
 
                 if user_role == 'admin':
-                    response = redirect(url_for('homepage_admin'))
+                    return redirect(url_for('homepage_admin'))
                 elif user_role == 'penghuni':
-                    response = redirect(url_for('views.homepage'))
+                    return redirect(url_for('views.homepage'))
                 else:
                     return jsonify({"result": "fail", "msg": "Invalid role"})
                 
@@ -196,8 +211,10 @@ def login():
             return render_template('views/login/login.html', error_msg="Invalid email or password")
 
     msg = request.args.get("msg")
-    return render_template('views/login/login.html', msg=msg) 
- 
+    return render_template('views/login/login.html', msg=msg)
+
+
+
 # Routes logout
 @app.route("/logout")
 def logout():
@@ -252,17 +269,8 @@ def homepage_admin():
     locale.setlocale(locale.LC_ALL, 'id_ID')
 
     transaksi_total_str = locale.currency(transaksi_total, grouping=True)
-
-    
-    pipeline = [
-        {
-            '$lookup': {
-                'from': 'users',
-                'localField': 'penghuni_id',
-                'foreignField': '_id',
-                'as': 'user_data'
-            }
-        },
+ 
+    pipeline = [ 
         {
             '$lookup': {
                 'from': 'penghuni',
@@ -310,6 +318,7 @@ def homepage_admin():
     # Print results for debugging
     for keluhan in keluhan_list:
         print(keluhan)
+     
     
     return render_template('views/admin/index.html', 
                         current_date=current_date, 
@@ -520,7 +529,7 @@ def hapus_penghuni(penghuni_id):
         transaksi = db.transaksi.find_one({"penghuni_id": ObjectId(penghuni_id)})
 
         if transaksi:
-            flash('Data penghuni gagal dihapus karena bersangkutan dengan data transaksi', 'error')
+            flash('Data penghuni gagal dihapus karena bersangkutan dengan data transaksi & data keluhan', 'error')
             return redirect(url_for('views.penghuni'))
 
         # Hapus data penghuni
@@ -784,8 +793,8 @@ def tambah_transaksi():
         if bukti_pembayaran and allowed_file(bukti_pembayaran.filename):
             today = datetime.now()
             my_time = today.strftime('%Y-%m-%d-%H-%M-%S')
-            extention = bukti_pembayaran.filename.rsplit('.', 1)[1].lower()
-            filename = secure_filename(f'bukti_pembayaran_{my_time}.{extention}')
+            extension = bukti_pembayaran.filename.rsplit('.', 1)[1].lower()
+            filename = secure_filename(f'bukti_pembayaran_{my_time}.{extension}')
             namaGambar = os.path.join(app.config["UPLOAD_FOLDER_TRANSAKSI"], filename)
             bukti_pembayaran.save(namaGambar)
         else:
@@ -806,8 +815,16 @@ def tambah_transaksi():
         
         try:
             db.transaksi.insert_one(doc)
-            # Update status kontrakan menjadi 'Penuh'
-            db.kontrakan.update_one({'_id': ObjectId(kontrakan_id)}, {'$set': {'status': 'Penuh'}})
+            
+            # Determine kontrakan status based on transaction status
+            if status == "Sudah Divalidasi":
+                kontrakan_status = 'Penuh'
+            else:
+                kontrakan_status = 'Booking'
+
+            # Update status kontrakan
+            db.kontrakan.update_one({'_id': ObjectId(kontrakan_id)}, {'$set': {'status': kontrakan_status}})
+            
             flash('Data Transaksi berhasil ditambahkan!', 'success')
         except Exception as e:
             flash('Data Transaksi gagal ditambahkan!', 'error')
@@ -943,12 +960,17 @@ def edit_transaksi(transaksi_id):
             # Update the transaction
             db.transaksi.update_one({'_id': ObjectId(transaksi_id)}, {'$set': update_data})
 
-            # Set old kontrakan status to 'Kosong' if different from new kontrakan_id
+            # Update status for old kontrakan if it has changed
             if old_kontrakan_id != ObjectId(kontrakan_id):
                 db.kontrakan.update_one({'_id': old_kontrakan_id}, {'$set': {'status': 'Kosong'}})
 
-            # Set new kontrakan status to 'Penuh'
-            db.kontrakan.update_one({'_id': ObjectId(kontrakan_id)}, {'$set': {'status': 'Penuh'}})
+            # Update status for new kontrakan based on the transaction status
+            if status == "Sudah Divalidasi":
+                kontrakan_status = 'Penuh'
+            else:
+                kontrakan_status = 'Booking'
+
+            db.kontrakan.update_one({'_id': ObjectId(kontrakan_id)}, {'$set': {'status': kontrakan_status}})
 
             flash('Data Transaksi Berhasil Diupdate!', 'success')
         except Exception as e:
@@ -1366,18 +1388,24 @@ def homepage():
     # Ubah nilai transaksi_total menjadi format mata uang yang diinginkan
     transaksi_total_str = locale.currency(transaksi_total, grouping=True)
 
-    pipeline = [
+    
+    pipeline = [ 
         {
-            '$match': {
-                'penghuni_id': user_id
+            '$lookup': {
+                'from': 'penghuni',
+                'localField': 'penghuni_id',
+                'foreignField': '_id',
+                'as': 'penghuni_data'
             }
         },
         {
-            '$lookup': {
-                'from': 'users',
-                'localField': 'penghuni_id',
-                'foreignField': '_id',
-                'as': 'user_data'
+            '$addFields': {
+                'nama_penghuni': {
+                    '$ifNull': [
+                        { '$arrayElemAt': ['$user_data.nama', 0] },
+                        { '$arrayElemAt': ['$penghuni_data.nama', 0] }
+                    ]
+                }
             }
         },
         {
@@ -1405,6 +1433,7 @@ def homepage():
     ]
 
     keluhan_list = list(db.keluhan.aggregate(pipeline))
+
 
     return render_template('views/penyewa/index.html', 
                            data_keluhan=keluhan_list, 
@@ -1568,10 +1597,12 @@ def tambah_keluhan_penyewa():
         try:
             penghuni_id = request.form['penghuni_id']
             kontrakan_id = request.form['kontrakan']
-            tgl_keluhan = request.form['tgl_keluhan']
-            status = request.form['status']
+            tgl_keluhan = request.form['tgl_keluhan'] 
             keluhan_penghuni = request.form['keluhan_penghuni']
             gambar_keluhan = request.files['gambar_keluhan']
+   
+             # Set default status to 'Belum Divalidasi'
+            status = 'Belum Divalidasi' 
 
             keluhan_data = {
                 'penghuni_id': ObjectId(penghuni_id),
@@ -1606,9 +1637,11 @@ def edit_keluhan_penyewa(keluhan_id):
         try: 
             kontrakan_id = request.form['kontrakan']
             tgl_keluhan = request.form['tgl_keluhan']
-            status = request.form['status']
             keluhan_penghuni = request.form['keluhan_penghuni']
             gambar_keluhan = request.files['gambar_keluhan']
+
+            # Set default status to 'Belum Divalidasi'
+            status = 'Belum Divalidasi'
 
             update_data = {
                 'kontrakan_id': ObjectId(kontrakan_id),
@@ -1799,9 +1832,11 @@ def tambah_transaksi_penyewa():
             jumlah_sewa = int(request.form['jumlah_sewa'])
             total_harga = int(request.form['total_harga'])
             uang_bayar = int(request.form['uang_bayar'])
-            kembalian = int(request.form['kembalian'])
-            status = request.form['status']
+            kembalian = int(request.form['kembalian']) 
             bukti_pembayaran = request.files['bukti_pembayaran']
+            # Set default status to 'Belum Divalidasi'
+            status = 'Belum Divalidasi'
+            
 
             if bukti_pembayaran and allowed_file(bukti_pembayaran.filename):
                 today = datetime.now()
@@ -1812,6 +1847,7 @@ def tambah_transaksi_penyewa():
                 bukti_pembayaran.save(namaGambar)
             else:
                 namaGambar = None
+                
 
             doc = {
                 'penghuni_id': ObjectId(penghuni_id),
@@ -1856,9 +1892,10 @@ def edit_transaksi_penyewa(transaksi_id):
         jumlah_sewa = int(request.form['jumlah_sewa'])
         total_harga = int(request.form['total_harga'])
         uang_bayar = int(request.form['uang_bayar'])
-        kembalian = int(request.form['kembalian'])
-        status = request.form['status']
+        kembalian = int(request.form['kembalian']) 
         bukti_pembayaran = request.files['bukti_pembayaran']
+        # Set default status to 'Belum Divalidasi'
+        status = 'Belum Divalidasi'
 
         update_data = {
             'penghuni_id': ObjectId(penghuni_id),
@@ -2029,16 +2066,7 @@ def seed_data():
             'status': 'Belum Menikah',
             'poto_ktp': '',
         },
-        {
-            'email': 'penghuni@gmail.com',
-            'password': generate_password_hash('penghuni1234'),
-            'role': 'penghuni',
-            'nama': 'Danu',
-            'umur': '24',
-            'jenisKelamin': 'Laki-Laki',
-            'status': 'Belum Menikah',
-            'poto_ktp': '',
-        }  
+        
     ]
     db.penghuni.insert_many(user_data)
  

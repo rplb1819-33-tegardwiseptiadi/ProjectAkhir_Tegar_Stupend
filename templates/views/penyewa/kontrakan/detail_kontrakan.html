@@ -10,7 +10,7 @@
         <h1>Detail Kontrakan</h1>
         <nav>
             <ol class="breadcrumb">
-                <li class="breadcrumb-item"><a href="{{ url_for('homepage_admin') }}">Dashboard</a></li>
+                <li class="breadcrumb-item"><a href="{{ url_for('views.homepage') }}">Dashboard</a></li>
         <li class="breadcrumb-item"><a href="{{ url_for('views.kontrakan') }}">Kontrakan</a></li>
          <li class="breadcrumb-item active">Detail Kontrakan</li>
             </ol>
@@ -55,7 +55,7 @@
                                 </div>
                             </div>  
                             <div class="text-center mt-3">
-                                <a href="{{ url_for('views.kontrakan') }}" class="btn btn-danger">Kembali</a>
+                                <a href="{{ url_for('views.penyewa_kontrakan') }}" class="btn btn-danger">Kembali</a>
                             </div>
                             {% endif %}
     

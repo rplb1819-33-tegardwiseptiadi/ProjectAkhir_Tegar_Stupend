@@ -49,13 +49,7 @@
                       <input type="date" class="form-control" id="tgl_keluhan" name="tgl_keluhan" value="{{ keluhan.tgl_keluhan }}">
                     </div>
 
-                    <div class="col-md-6">
-                      <label class="form-label">Status Validasi</label>
-                      <div class="form-check">
-                        <input class="form-check-input" type="radio" id="status2" name="status" value="Belum Divalidasi" {% if keluhan.status == 'Belum Divalidasi' %} checked {% endif %}>
-                        <label class="form-check-label" for="status2">Belum Divalidasi</label>
-                      </div>
-                    </div>
+             
 
                     <div class="col-md-12">
                       <label for="keluhan_penghuni" class="form-label">Keluhan Penghuni</label>
@@ -115,11 +109,7 @@
             alert("Tanggal keluhan harus diisi.");
             isValid = false;
         }
-
-        if (!status2) {
-            alert("Status validasi harus dipilih.");
-            isValid = false;
-        }
+ 
 
         if (keluhan_penghuni === "") {
             alert("Keluhan penghuni harus diisi.");

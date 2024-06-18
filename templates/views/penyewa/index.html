@@ -84,31 +84,32 @@
       <div class="col-lg-7">
         <div class="card recent-sales overflow-auto">
           <div class="card-body">
-            <h5 class="card-title">Riwayat Keluhan Penghuni</h5>
+            <h5 class="card-title">Riwayat | Keluhan Penghuni</h5>
 
             <table id="example" class="table table-bordered table-striped table-hover">
               <thead>
                 <tr>
-                  <th scope="col">No</th>
-                  <th scope="col">Gambar</th>
-                  <th scope="col">Nama</th>
-                  <th scope="col">Kontrakan</th>
-                  <th scope="col">Tgl</th>
-                  <th scope="col">Status</th>
-                  <th scope="col">Keluhan</th>
+                  <th style="text-align: center;" scope="col">No</th>
+                  <th style="text-align: center;" scope="col">Gambar</th>
+                  <th style="text-align: center;" scope="col">Nama</th>
+                  <th style="text-align: center;" scope="col">Kontrakan</th>
+                  <th style="text-align: center;" scope="col">Tgl</th>
+                  <th style="text-align: center;" scope="col">Status</th>
+                  <th style="text-align: center;" scope="col">Keluhan</th>
                 </tr>
               </thead>
               <tbody>
                 {% for keluhan in data_keluhan %}
-                <tr>
-                  <td>{{ loop.index }}</td>
-                  <td>
+                {% if keluhan.status == "Sudah Divalidasi" %}
+                 <tr style="vertical-align: middle;">
+                  <td style="text-align: center;">{{ loop.index }}</td>
+                  <td style="text-align: center;">
                     <img src="{{ url_for('static', filename=keluhan.gambar_keluhan.split('static/')[-1].replace('\\', '/')) }}" alt="Gambar Keluhan" class="img-fluid" style="max-width: 150px; max-height: 150px;">
                   </td>
-                  <td>{{ keluhan.nama_penghuni }}</td>
-                  <td>{{ keluhan.nama_kontrakan }}</td>
-                  <td>{{ keluhan.tgl_keluhan }}</td>
-                  <td>
+                  <td style="text-align: center;">{{ keluhan.nama_penghuni }}</td>
+                  <td style="text-align: center;">{{ keluhan.nama_kontrakan }}</td>
+                  <td style="text-align: center;">{{ keluhan.tgl_keluhan }}</td>
+                  <td style="text-align: center;">
                     {% if keluhan.status == "Sudah Divalidasi" %}
                     <button class="btn btn-success">Sudah Divalidasi</button>
                     {% elif keluhan.status == "Belum Divalidasi" %}
@@ -117,6 +118,7 @@
                   </td>
                   <td>{{ keluhan.keluhan_penghuni }}</td>
                 </tr>
+                {% endif %}
                 {% endfor %}
               </tbody>
             </table>

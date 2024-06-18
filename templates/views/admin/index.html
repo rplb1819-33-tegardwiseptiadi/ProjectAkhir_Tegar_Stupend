@@ -98,7 +98,7 @@
     <div class="col-lg-12">
       <div class="card recent-sales overflow-auto">
         <div class="card-body">
-          <h5 class="card-title">Riwayat Keluhan Penghuni</h5>
+          <h5 class="card-title">Riwayat | Keluhan Penghuni</h5>
           
           <table class="table table-borderless datatable">
             <thead>
@@ -115,7 +115,8 @@
           
             <tbody>
               {% for keluhan in data_keluhan %}
-              <tr>
+              {% if keluhan.status == "Sudah Divalidasi" %}
+              <tr style="vertical-align: middle;">
                   <td scope="row">{{ loop.index }}</td>
                   <td>
                     <img
@@ -130,14 +131,12 @@
                   <td>{{ keluhan.tgl_keluhan }}</td>
                   <td>{{ keluhan.keluhan_penghuni }}</td>
                   <td>
-                      {% if keluhan.status == "Sudah Divalidasi" %}
                       <button class="btn btn-success">Sudah Divalidasi</button>
-                      {% elif keluhan.status == "Belum Divalidasi" %}
-                      <button class="btn btn-danger">Belum Divalidasi</button>
-                      {% endif %}
                   </td> 
               </tr>
-              {% endfor %}
+              {% endif %}
+            {% endfor %}
+            
           </tbody>
             
           </table> 
@@ -152,23 +151,4 @@
 
 <!-- footer -->
 {% include '/admin/dashboard/footer.html' %}
- 
-</body> 
-
-<script>  
-  // SweetAlert for flash messages
-  document.addEventListener('DOMContentLoaded', function() {
-    {% with messages = get_flashed_messages(with_categories=true) %}
-      {% if messages %}
-        {% for category, message in messages %}
-          Swal.fire({
-            title: "{{ 'Error' if category == 'error' else 'Success' }}",
-            text: "{{ message }}",
-            icon: "{{ 'error' if category == 'error' else 'success' }}",
-            confirmButtonText: 'OK'
-          });
-        {% endfor %}
-      {% endif %}
-    {% endwith %}
-  });
-</script>
+  

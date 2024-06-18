@@ -1,10 +1,8 @@
 <!-- Header -->
 {% include '/admin/dashboard/header.html' %}
 
-
 <!-- Sidebar -->
 {% include '/admin/dashboard/sidebar.html' %}
-
 
 <main id="main" class="main">
   <div class="pagetitle">
@@ -30,10 +28,9 @@
             <div class="card recent-sales overflow-auto">
               <div class="card-body">
                 <h5 class="card-title">Data <span>| Penghuni</span></h5>
-                <div class="btn_tambah">
+                <div class="btn_tambah mb-3">
                   <a href="{{ url_for('views.tambah_penghuni') }}" class="btn btn-success">Tambah Data</a>
-              </div>
-              
+                </div>
 
                 <table class="table table-borderless datatable">
                   <thead>
@@ -48,7 +45,7 @@
                   </thead>
                   <tbody>
                     {% for penghuni in data_penghuni %}
-                    <tr>
+                    <tr style="vertical-align: middle;">
                       <td scope="row">{{ loop.index }}</td>
                       <td>
                         <img
@@ -67,26 +64,14 @@
                           <a
                             href="{{ url_for('views.edit_penghuni', penghuni_id=penghuni._id) }}"
                             class="btn btn-primary"
-                            >Edit</a
-                          >
+                          >Edit</a>
                           <a
                             href="{{ url_for('views.detail_penghuni', penghuni_id=penghuni._id) }}"
                             class="btn btn-warning"
-                            >Detail</a
-                          >
+                          >Detail</a>
 
-                          <form
-                            action="{{ url_for('views.hapus_penghuni', penghuni_id=penghuni._id) }}"
-                            method="POST"
-                          >
-                            <!-- Include the necessary form fields and submit button -->
-                            <button
-                              type="submit"
-                              class="btn btn-danger"
-                              onclick="return confirmDelete('Apakah anda yakin ingin menghapus penghuni {{ penghuni.nama }}?')"
-                            >
-                              Delete
-                            </button>
+                          <form action="{{ url_for('views.hapus_penghuni', penghuni_id=penghuni._id) }}" method="POST" id="deleteForm-{{ penghuni._id }}">
+                            <button type="button" class="btn btn-danger" onclick="confirmDelete('{{ penghuni.nama }}', '{{ penghuni._id }}')">Delete</button>
                           </form>
                         </div>
                       </td>
@@ -109,10 +94,25 @@
 <!-- footer -->
 {% include '/admin/dashboard/footer.html' %}
 
-
 <script>
-  function confirmDelete(namaPenghuni) {
-    return confirm('Apakah anda yakin ingin menghapus penghuni ' + namaPenghuni + '?');
+  function confirmDelete(namaPenghuni, formId) {
+    Swal.fire({
+      title: 'Konfirmasi Hapus',
+      text: `Apakah Anda yakin ingin menghapus penghuni ${namaPenghuni}?`,
+      icon: 'warning',
+      showCancelButton: true, 
+      confirmButtonText: 'Ya, Hapus!',
+      cancelButtonText: 'Batal',
+      customClass: {
+        confirmButton: 'btn btn-success',
+        cancelButton: 'btn btn-danger'
+    },
+    buttonsStyling: false
+    }).then((result) => {
+      if (result.isConfirmed) {
+        document.getElementById('deleteForm-' + formId).submit(); // Submit the form if confirmed
+      }
+    });
   }
 
   // SweetAlert for flash messages
@@ -124,11 +124,14 @@
             title: "{{ 'Error' if category == 'error' else 'Success' }}",
             text: "{{ message }}",
             icon: "{{ 'error' if category == 'error' else 'success' }}",
-            confirmButtonText: 'OK'
+            confirmButtonText: 'OK',
+            customClass: {
+              confirmButton: 'btn btn-success', 
+          },
+          buttonsStyling: false
           });
         {% endfor %}
       {% endif %}
     {% endwith %}
   });
 </script>
-

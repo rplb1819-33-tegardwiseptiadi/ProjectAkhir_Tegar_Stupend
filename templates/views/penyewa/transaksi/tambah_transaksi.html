@@ -223,29 +223,7 @@
                 </div>
               </div>
 
-              <!-- Status Bayar -->
-              <div class="col-md-5">
-                <label for="inputStatus" class="form-label">Status</label>
-                <div class="form-check">
-                  <input
-                    class="form-check-input"
-                    type="radio"
-                    name="status"
-                    id="status2"
-                    value="Belum Divalidasi"
-                  />
-                  <label class="form-check-label" for="status2"
-                    >Belum Divalidasi</label
-                  >
-                </div>
-                <div
-                  id="status-alert"
-                  class="alert alert-danger mt-2"
-                  style="display: none"
-                >
-                  Status pembayaran harus dipilih.
-                </div>
-              </div>
+              
 
               <!-- Bukti Pembayaran -->
               <div class="col-md-10">
@@ -388,10 +366,7 @@
     var jumlahSewa = document.getElementById("inputJumlahSewa").value;
     var totalHarga = document.getElementById("inputTotalHarga").value;
     var uangBayar = document.getElementById("inputUangBayar").value;
-    var kembalian = document.getElementById("inputKembalian").value;
-    var statusInputs = document.querySelectorAll(
-      'input[name="status"]:checked'
-    );
+    var kembalian = document.getElementById("inputKembalian").value; 
     var buktiPembayaran = document.getElementById("inputBuktiPembayaran").value;
 
     var isValid = true;
@@ -429,12 +404,13 @@
     }
 
     // Jumlah Sewa
-    if (jumlahSewa === "" || isNaN(jumlahSewa)) {
+    if (jumlahSewa === "" || isNaN(jumlahSewa) || parseInt(jumlahSewa) <= 0) {
       document.getElementById("jumlah_sewa-alert").style.display = "block";
       isValid = false;
     } else {
       document.getElementById("jumlah_sewa-alert").style.display = "none";
     }
+
 
     // Total Harga
     if (totalHarga === "" || isNaN(totalHarga)) {
@@ -458,15 +434,7 @@
       isValid = false;
     } else {
       document.getElementById("kembalian-alert").style.display = "none";
-    }
-
-    // Status
-    if (!statusInputs || statusInputs.length === 0) {
-      document.getElementById("status-alert").style.display = "block";
-      isValid = false;
-    } else {
-      document.getElementById("status-alert").style.display = "none";
-    }
+    } 
 
     // Bukti Pembayaran
     if (buktiPembayaran === "") {

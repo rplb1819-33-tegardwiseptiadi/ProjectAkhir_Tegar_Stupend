@@ -28,10 +28,10 @@
             <div class="card recent-sales overflow-auto">
               <div class="card-body">
                 <h5 class="card-title">Data <span>| Keluhan</span></h5>
-                <div class="btn_tambah">
+                <div class="btn_tambah mb-3">
                   <a href="{{ url_for('views.tambah_keluhan') }}" class="btn btn-success">Tambah Data</a>
                 </div>
- 
+
                 <table class="table table-borderless datatable">
                   <thead>
                     <tr>
@@ -45,23 +45,21 @@
                       <th scope="col">Aksi</th>
                     </tr>
                   </thead>
-                
                   <tbody>
                     {% for keluhan in data_keluhan %}
-                    <tr>
+                    <tr style="vertical-align: middle;">
                         <td scope="row">{{ loop.index }}</td>
                         <td>
                           <img
-                          src="{{ url_for('static', filename=keluhan.gambar_keluhan.split('static/')[-1].replace('\\', '/')) }}"
-                          alt="Gambar Transaksi"
-                          class="img-fluid"
-                          style="max-width: 150px; max-height: 150px"
+                            src="{{ url_for('static', filename=keluhan.gambar_keluhan.split('static/')[-1].replace('\\', '/')) }}"
+                            alt="Gambar Keluhan"
+                            class="img-fluid"
+                            style="max-width: 150px; max-height: 150px"
                           />
-                      </td>
+                        </td>
                         <td>{{ keluhan.nama_penghuni }}</td>
                         <td>{{ keluhan.nama_kontrakan }}</td>
                         <td>{{ keluhan.tgl_keluhan }}</td>
-                        <td>{{ keluhan.keluhan_penghuni }}</td>
                         <td>
                             {% if keluhan.status == "Sudah Divalidasi" %}
                             <button class="btn btn-success">Sudah Divalidasi</button>
@@ -69,20 +67,24 @@
                             <button class="btn btn-danger">Belum Divalidasi</button>
                             {% endif %}
                         </td>
+                        <td>{{ keluhan.keluhan_penghuni }}</td>
                         <td>
                             <div class="button-container">
                                 <a href="{{ url_for('views.edit_keluhan', keluhan_id=keluhan._id) }}" class="btn btn-warning">Edit</a>
                                 <a href="{{ url_for('views.detail_keluhan', keluhan_id=keluhan._id) }}" class="btn btn-primary">Detail</a>
-                                <form action="{{ url_for('views.hapus_keluhan', keluhan_id=keluhan._id) }}" method="post">
-                                    <button type="submit" class="btn btn-danger" onclick="return confirm('Apakah anda yakin ingin menghapus keluhan {{ keluhan.nama_penghuni }}?')">Hapus</button>
+                                <form
+                                  action="{{ url_for('views.hapus_keluhan', keluhan_id=keluhan._id) }}"
+                                  method="POST"
+                                  id="deleteForm-{{ keluhan._id }}"
+                                  style="display:inline"
+                                >
+                                  <button type="button" class="btn btn-danger" onclick="confirmDelete('{{ keluhan.nama_penghuni }}', '{{ keluhan._id }}')">Hapus</button>
                                 </form>
                             </div>
                         </td>
                     </tr>
                     {% endfor %}
-                </tbody>
-                
-
+                  </tbody>
                 </table> 
               </div>
             </div>
@@ -95,29 +97,32 @@
   </section>
 </main>
 <!-- End #main -->
+
 <!-- footer -->
 {% include '/admin/dashboard/footer.html' %}
 
-
+<!-- SweetAlert -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <script>
-  function confirmDelete(namaKeluhan) {
-    return confirm('Apakah anda yakin ingin menghapus Keluhan ' + namaKeluhan + '?');
+  function confirmDelete(namaKeluhan, formId) {
+    Swal.fire({
+      title: 'Konfirmasi Hapus',
+      text: `Apakah Anda yakin ingin menghapus keluhan ${namaKeluhan}?`,
+      icon: 'warning',
+      showCancelButton: true, 
+      confirmButtonText: 'Ya, Hapus!',
+      cancelButtonText: 'Batal',
+      customClass: {
+        confirmButton: 'btn btn-success',
+        cancelButton: 'btn btn-danger'
+    },
+    buttonsStyling: false
+    }).then((result) => {
+      if (result.isConfirmed) {
+        document.getElementById('deleteForm-' + formId).submit(); // Submit the form if confirmed
+      }
+    });
   }
-
-  // SweetAlert for flash messages
-  document.addEventListener('DOMContentLoaded', function() {
-    {% with messages = get_flashed_messages(with_categories=true) %}
-      {% if messages %}
-        {% for category, message in messages %}
-          Swal.fire({
-            title: "{{ 'Error' if category == 'error' else 'Success' }}",
-            text: "{{ message }}",
-            icon: "{{ 'error' if category == 'error' else 'success' }}",
-            confirmButtonText: 'OK'
-          });
-        {% endfor %}
-      {% endif %}
-    {% endwith %}
-  });
+ 
 </script>

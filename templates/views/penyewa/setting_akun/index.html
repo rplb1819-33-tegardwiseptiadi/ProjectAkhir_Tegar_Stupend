@@ -99,10 +99,12 @@
 <!-- footer -->
 {% include '/penyewa/dashboard/footer.html' %}
 
+<!-- SweetAlert -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 <script>
   document.getElementById("form-penghuni").addEventListener("submit", function(event) {
       event.preventDefault(); // Prevent default form submission
-      
       validateForm(); // Validate form
   });
 
@@ -127,18 +129,30 @@
       }
   
       if (isValid) { 
-          document.getElementById("form-penghuni").submit(); // Submit form
+          submitForm(); // Proceed to submit form
       } else {
-          alert('Akun Penghuni Gagal Diupdate!'); // Display an alert if the form is not valid
-          document.getElementById("error-alert").innerText = "Data Penghuni Gagal Diupdate!";
-          document.getElementById("error-alert").style.display = "block";
+          showErrorAlert();
       }
   }
 
-  // Setelah form berhasil dikirim, tampilkan pesan sukses
-  document.getElementById("form-penghuni").onsubmit = function() {
-    alert('Akun Berhasil Diupdate!'); // Display an alert if the form is valid
-    document.getElementById("success-alert").innerText = "Akun Berhasil Diupdate!!";
-    document.getElementById("success-alert").style.display = "block";
-  };
+  function submitForm() {
+      Swal.fire({
+          icon: 'success',
+          title: 'Akun Berhasil Diupdate!',
+          text: 'Akun Berhasil Diupdate!',
+          confirmButtonText: 'OK'
+      }).then((result) => {
+          if (result.isConfirmed) {
+              document.getElementById("form-penghuni").submit(); // Submit form after the alert is confirmed
+          }
+      });
+  }
+
+  function showErrorAlert() {
+      Swal.fire({
+          icon: 'error',
+          title: 'Akun Penghuni Gagal Diupdate!',
+          text: 'Data Penghuni Gagal Diupdate!'
+      });
+  }
 </script>

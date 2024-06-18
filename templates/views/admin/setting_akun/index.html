@@ -98,7 +98,7 @@
 
 <!-- footer -->
 {% include '/admin/dashboard/footer.html' %}
-
+ 
 <script>
   document.getElementById("form-admin").addEventListener("submit", function(event) {
       event.preventDefault(); // Prevent default form submission
@@ -127,18 +127,24 @@
       }
   
       if (isValid) { 
-          document.getElementById("form-admin").submit(); // Submit form
+          confirmUpdate(); // Proceed to confirm update
       } else {
-          alert('Akun Admin Gagal Diupdate!'); // Display an alert if the form is not valid
-          document.getElementById("error-alert").innerText = "Data Admin Gagal Diupdate!";
-          document.getElementById("error-alert").style.display = "block";
+          Swal.fire({
+              icon: 'error',
+              title: 'Akun Admin Gagal Diupdate!',
+              text: 'Data Admin Gagal Diupdate!'
+          });
       }
   }
 
-  // Setelah form berhasil dikirim, tampilkan pesan sukses
-  document.getElementById("form-admin").onsubmit = function() {
-    alert('Akun Berhasil Diupdate!'); // Display an alert if the form is valid
-    document.getElementById("success-alert").innerText = "Akun Berhasil Diupdate!!";
-    document.getElementById("success-alert").style.display = "block";
-  };
+  function confirmUpdate() {
+      Swal.fire({
+          icon: 'success',
+          title: 'Akun Berhasil Diupdate!',
+          text: 'Akun Berhasil Diupdate!',
+          confirmButtonText: 'OK'
+      }).then(function() {
+          document.getElementById("form-admin").submit(); // Submit form after OK is clicked
+      });
+  }
 </script>

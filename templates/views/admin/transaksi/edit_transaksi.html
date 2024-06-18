@@ -55,7 +55,7 @@
                 <select id="inputKontrakan" name="kontrakan" class="form-select">
                   <option selected value="{{ transaksi.kontrakan._id }}" data-harga="{{ transaksi.kontrakan.harga }}">{{ transaksi.kontrakan.nama_kontrakan }}</option>
                   {% for k in kontrakan %}
-                  {% if k.status == 'kosong'%}
+                  {% if k.status == 'Kosong'%}
                   <option value="{{ k._id }}" data-harga="{{ k.harga }}">{{ k.nama_kontrakan }}</option>
                   {% endif %}
                   {% endfor %}
@@ -249,12 +249,13 @@ function validateForm(event) {
   }
 
   // Jumlah Sewa
-  if (jumlahSewa === "" || isNaN(jumlahSewa)) {
-    document.getElementById("jumlah_sewa-alert").style.display = "block";
-    isValid = false;
-  } else {
-    document.getElementById("jumlah_sewa-alert").style.display = "none";
-  }
+if (jumlahSewa === "" || isNaN(jumlahSewa) || parseInt(jumlahSewa) <= 0) {
+  document.getElementById("jumlah_sewa-alert").style.display = "block";
+  isValid = false;
+} else {
+  document.getElementById("jumlah_sewa-alert").style.display = "none";
+}
+
 
   // Total Harga
   if (totalHarga === "" || isNaN(totalHarga)) {
@@ -291,7 +292,7 @@ function validateForm(event) {
   if (isValid) {
     Swal.fire({
       title: 'Success',
-      text: 'Data Transaksi Berhasil Ditambahkan!',
+      text: 'Data Transaksi Berhasil Di Update!!',
       icon: 'success',
       confirmButtonText: 'OK'
     }).then(() => {
@@ -300,7 +301,7 @@ function validateForm(event) {
   } else {
     Swal.fire({
       title: "Error",
-      text: "Data Transaksi Gagal Ditambahkan!",
+      text: "Data Transaksi Gagal Di Update!!",
       icon: "error",
       confirmButtonText: "OK",
     });   
