@@ -21,25 +21,29 @@
 
 <!-- Kontrakan Card -->
 <div class="col-md-6 mb-6">
-  <div class="card info-card sales-card">
-      <div class="card-body">
-          <h5 class="card-title">Total <span>| Kontrakan</span></h5>
-          <div class="d-flex align-items-center">
-              <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
-                  <i class="bi bi-house"></i>
-              </div>
-              <div class="ps-3">
-                  <h6>{{ kontrakan_count }} Kontrakan</h6>
-              </div>
-          </div>
-      </div>
-  </div>
+  <a href="{{ url_for('views.kontrakan') }}">
+    <div class="card info-card sales-card">
+        <div class="card-body">
+            <h5 class="card-title">Total <span>| Kontrakan</span></h5>
+            <div class="d-flex align-items-center">
+                <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
+                    <i class="bi bi-house"></i>
+                </div>
+                <div class="ps-3">
+                    <h6>{{ kontrakan_count }} Kontrakan</h6>
+                </div>
+            </div>
+        </div>
+    </div>
+  </a>
 </div>
+
 <!-- End Kontrakan Card -->
 
 <!-- Keluhan Card -->
 <div class="col-md-6 mb-6">
-  <div class="card info-card customers-card">
+  <a href="{{ url_for('views.keluhan') }}">
+    <div class="card info-card customers-card">
       <div class="card-body">
           <h5 class="card-title">Total <span>| Keluhan</span></h5>
           <div class="d-flex align-items-center">
@@ -52,42 +56,47 @@
           </div>
       </div>
   </div>
+  </a>
 </div>
 <!-- End Keluhan Card -->
 
 <!-- Transaksi Card -->
 <div class="col-md-6 mb-6">
-  <div class="card info-card revenue-card">
+  <a href="{{ url_for('views.transaksi') }}">
+    <div class="card info-card revenue-card">
       <div class="card-body">
-          <h5 class="card-title">Total <span>| Transaksi</span></h5>
-          <div class="d-flex align-items-center">
-              <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
-                  <i class="bi bi-currency-dollar"></i>
-              </div>
-              <div class="ps-3">
-                  <h6>{{ transaksi_total }}</h6>
-              </div>
+        <h5 class="card-title">Total <span>| Transaksi</span></h5>
+        <div class="d-flex align-items-center">
+          <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
+            <i class="bi bi-currency-dollar"></i>
           </div>
+          <div class="ps-3">
+            <h6>{{ transaksi_total }}</h6>
+          </div>
+        </div>
       </div>
-  </div>
+    </div>
+  </a>
 </div>
 <!-- End Transaksi Card -->
 
 <!-- Penghuni Card -->
 <div class="col-md-6 mb-6">
-  <div class="card info-card customers-card">
-      <div class="card-body">
-          <h5 class="card-title">Total <span>| Penghuni</span></h5>
-          <div class="d-flex align-items-center">
-              <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
-                  <i class="bi bi-people"></i>
-              </div>
-              <div class="ps-3">
-                  <h6>{{ penghuni_count }} Penghuni</h6>
-              </div>
-          </div>
-      </div>
-  </div>
+  <a href="{{ url_for('views.penghuni') }}">
+    <div class="card info-card customers-card">
+        <div class="card-body">
+            <h5 class="card-title">Total <span>| Penghuni</span></h5>
+            <div class="d-flex align-items-center">
+                <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
+                    <i class="bi bi-people"></i>
+                </div>
+                <div class="ps-3">
+                    <h6>{{ penghuni_count }} Penghuni</h6>
+                </div>
+            </div>
+        </div>
+    </div>
+  </a>
 </div>
 <!-- End Penghuni Card -->
 

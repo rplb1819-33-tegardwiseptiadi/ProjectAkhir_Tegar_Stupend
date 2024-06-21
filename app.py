@@ -1361,11 +1361,17 @@ def hapus_keluhan(keluhan_id):
 def homepage():
     # Ambil seluruh data penghuni dari MongoDB 
     kontrakan_count = db.kontrakan.count_documents({})
-    keluhan_count = db.keluhan.count_documents({})
+   
+    # Ambil data keluhan dari MongoDB yang statusnya "Sudah Divalidasi"
+    keluhan_count = db.keluhan.count_documents({"status": "Sudah Divalidasi"})
+
 
     # Mendapatkan user_id dari pengguna yang sedang login
     user_id = g.current_user['_id']
-
+    
+      # Menghitung jumlah transaksi dari akun yang login
+    transaksi_count = db.transaksi.count_documents({"penghuni_id": user_id})
+ 
     # Mengambil total transaksi hanya untuk akun yang login
     transaksi_total = db.transaksi.aggregate([
         {
@@ -1437,6 +1443,7 @@ def homepage():
 
     return render_template('views/penyewa/index.html', 
                            data_keluhan=keluhan_list, 
+                           transaksi_count=transaksi_count,
                            kontrakan_count=kontrakan_count,
                            keluhan_count=keluhan_count,
                            transaksi_total=transaksi_total_str)
